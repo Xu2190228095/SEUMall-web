@@ -9,6 +9,7 @@ import TestTry from './views/home/index.vue'
 <!--   <HelloWorld msg="Welcome to Your Vue.js + Vite App!!!"/>-->
   <HelloWorld/>
   <TestTry/>
+
 </template>
 
 <style>
