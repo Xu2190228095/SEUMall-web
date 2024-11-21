@@ -9,9 +9,14 @@ const router = new createRouter({
       path: '/',     //根路径
       name: 'Hello',  //路由名称
       component: HelloWorld  //路由组件
+    },
+    {
+        path: '/home',
+        name: 'Home',
+        component: () => import('../views/home/index.vue')  //懒加载
     }
   ]
-})   //创建Router实例                                       
+})   //创建Router实例                                     
 
 export default router   //导出Router实例
 
