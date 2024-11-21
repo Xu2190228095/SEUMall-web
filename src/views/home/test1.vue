@@ -1,7 +1,7 @@
 <template>
   <el-header>
     <div>
-      <span>Vue3商城后台管理系统</span>
+      <span>TRY路由测试</span>
     </div>
     <el-button type="info" @click="logout">退出</el-button>
   </el-header>
@@ -72,5 +72,4 @@
   cursor: pointer;
 }
 </style>
-
 
