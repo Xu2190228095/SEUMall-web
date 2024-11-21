@@ -1,18 +1,17 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createApp } from 'vue'
+import { createRouter, createWebHistory } from 'vue-router';
+import HelloWorld from '../components/HelloWorld.vue'  //引入根目录下的Hello.vue组件
 
-import Test1 from '../views/home/test1.vue'
+const router = new createRouter({
+  history: createWebHistory(),  
+  routes: [
+    {
+      path: '/',     //根路径
+      name: 'Hello',  //路由名称
+      component: HelloWorld  //路由组件
+    }
+  ]
+})   //创建Router实例                                       
 
-const router = createRouter({
-    history: createWebHistory(import.meta.env.BASE_URL),//路由模式，默认
-    routes: [//路由配置 通过路由进行整体配置
-//数组，
-        {
-            path:'/Test1',
-            component:Test1,
-
-        },
-    ]
-})
-
-export default router//暴漏router对象，以便在Vue应用的入口文件中导入并使用它。
+export default router   //导出Router实例
 

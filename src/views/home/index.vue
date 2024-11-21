@@ -72,5 +72,3 @@
   cursor: pointer;
 }
 </style>
-
-
