@@ -1,6 +1,6 @@
 import { createApp } from 'vue'
 import { createRouter, createWebHistory } from 'vue-router';
-import HelloWorld from '../components/HelloWorld.vue'  //引入根目录下的Hello.vue组件
+import HelloWorld from '@/components/HelloWorld.vue'  //引入根目录下的Hello.vue组件
 
 const router = new createRouter({
   history: createWebHistory(),  
@@ -13,10 +13,15 @@ const router = new createRouter({
     {
         path: '/home',
         name: 'Home',
-        component: () => import('../views/home/index.vue')  //懒加载
+        component: () => import('@/views/home/index.vue')  //懒加载
+    },
+    {
+        path: '/login',
+        name: 'Login',
+        component: () => import('@/views/User/login.vue')
     }
   ]
-})   //创建Router实例                                       
+})   //创建Router实例                                     
 
 export default router   //导出Router实例
 
