@@ -25,6 +25,11 @@ const router = new createRouter({
           name: 'Admin',
           component: () => import('@/views/admin/index.vue')
       },
+    {
+        path: '/productInterface',
+        name: 'productInterface',
+        component: () => import('@/views/User/productInterface.vue')//商品界面
+    },
   ]
 })   //创建Router实例                                     
 
