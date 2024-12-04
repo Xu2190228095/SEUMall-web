@@ -38,7 +38,7 @@
   <script lang="ts" setup>
   import { ref, onMounted } from 'vue'
   import axios from 'axios'
-  import { ElSpin, ElAlert, ElButton } from 'element-plus'
+  // import { ElSpin, ElAlert, ElButton } from 'element-plus'
   
   // 用来存储地址信息
   const addressInfo = ref({
