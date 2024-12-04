@@ -72,7 +72,7 @@
       <el-button
         class="btn-add"
         @click="handleAddProduct()"
-        size="mini">
+        size="small">
         添加
       </el-button>
     </el-card>
@@ -88,7 +88,7 @@
           <template slot-scope="scope">{{scope.row.id}}</template>
         </el-table-column>
         <el-table-column label="商品图片" width="120" align="center">
-          <template slot-scope="scope"><img style="height: 80px" :src="scope.row.pic"></template>
+          <template slot-scope="scope"><img style="height: 80px" :src="scope.row.pic" alt="none"></template>
         </el-table-column>
         <el-table-column label="商品名称" align="center">
           <template slot-scope="scope">
@@ -156,21 +156,21 @@
           <template slot-scope="scope">
             <p>
               <el-button
-                size="mini"
+                size="small"
                 @click="handleShowProduct(scope.$index, scope.row)">查看
               </el-button>
               <el-button
-                size="mini"
+                size="small"
                 @click="handleUpdateProduct(scope.$index, scope.row)">编辑
               </el-button>
             </p>
             <p>
               <el-button
-                size="mini"
+                size="small"
                 @click="handleShowLog(scope.$index, scope.row)">日志
               </el-button>
               <el-button
-                size="mini"
+                size="small"
                 type="danger"
                 @click="handleDelete(scope.$index, scope.row)">删除
               </el-button>
@@ -373,7 +373,7 @@
     },
     watch: {
       selectProductCateValue: function (newValue) {
-        if (newValue != null && newValue.length == 2) {
+        if (newValue != null && newValue.length === 2) {
           this.listQuery.productCategoryId = newValue[1];
         } else {
           this.listQuery.productCategoryId = null;
