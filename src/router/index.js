@@ -35,6 +35,11 @@ const router = new createRouter({
       name: 'userInfo',
       component: () => import('@/views/User/userInfo.vue')//个人信息界面
     },
+    {
+      path: '/pay',
+      name: 'pay',
+      component: () => import('@/views/User/pay.vue')//个人信息界面
+    },
   ]
 })   //创建Router实例                                     
 
