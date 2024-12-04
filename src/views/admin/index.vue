@@ -428,3 +428,5 @@ export default {
   font-size: 18px
 }
 </style>
+<script setup lang="ts">
+</script>
