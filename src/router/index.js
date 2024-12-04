@@ -37,12 +37,26 @@ const router = new createRouter({
           path: '/test',
           name: 'Test',
           component: Layout,
-          meta: {title: '商品', icon: 'product'},
           children: [{
-              path: 'product',
-              name: 'product',
-              component: () => import('@/views/admin/product/index.vue'),
-          }
+              path: 'product_info',
+              name: 'product_info',
+              component: () => import('@/views/admin/product/ProductInfo.vue'),
+          },
+          {
+              path: 'product_add',
+              name: 'product_add',
+              component: () => import('@/views/admin/product/AddProduct.vue'),
+          },
+          {
+              path: 'order_info',
+              name: 'order_info',
+              component: () => import('@/views/admin/product/OrderInfo.vue'),
+          },
+          {
+              path: 'refund_deal',
+              name: 'refund_deal',
+              component: () => import('@/views/admin/product/RefundDeal.vue'),
+          },
           ]
       },
     {
@@ -63,18 +77,6 @@ const router = new createRouter({
   ]
 })   //创建Router实例
 
-export const asyncRouterMap = [
-    {
-        path: '/pms',
-        component: Layout,
-        children: [{
-            path: '/product',
-            name: 'product',
-            component: () => import('@/views/admin/product/index.vue'),
-        }
-        ]
-    },
-]
 
 export default router   //导出Router实例
 

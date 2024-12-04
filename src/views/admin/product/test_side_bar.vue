@@ -2,9 +2,9 @@
   <div class="sidebar">
     <ul>
       <li v-for="category in categories" :key="category.id">
-        <a :href="category.link" @click.prevent="handleClick(category.name)">
+        <router-link :to="category.route">
           {{ category.name }}
-        </a>
+        </router-link>
       </li>
     </ul>
   </div>
@@ -17,10 +17,10 @@ export default {
     return {
       // 固定的类别数据
       categories: [
-        { id: 1, name: 'Home', link: '#' },
-        { id: 2, name: 'About', link: '#' },
-        { id: 3, name: 'Services', link: '#' },
-        { id: 4, name: 'Contact', link: '#' },
+        { id: 1, name: 'product_info', link: { name: 'product_info' }  },
+        { id: 2, name: '添加商品', link: { name: 'product_add' }  },
+        { id: 3, name: '订单列表', link: { name: 'order_info' }  },
+        { id: 4, name: '退货处理', link: { name: 'refund_deal' }  },
       ],
     };
   },
@@ -36,7 +36,7 @@ export default {
 
 <style scoped>
 .sidebar {
-  width: 250px;
+  width: 20%;
   background-color: #333;
   color: white;
   padding: 20px;
