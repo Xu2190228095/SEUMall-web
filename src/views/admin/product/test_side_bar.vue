@@ -2,7 +2,7 @@
   <div class="sidebar">
     <ul>
       <li v-for="category in categories" :key="category.id">
-        <router-link :to="category.route">
+        <router-link :to="category.link">
           {{ category.name }}
         </router-link>
       </li>
