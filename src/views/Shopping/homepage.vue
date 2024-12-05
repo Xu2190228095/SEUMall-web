@@ -2,7 +2,7 @@
   <div id="app">
     <!-- 顶部导航栏 -->
     <el-header class="header">
-      <div class="logo">购物网站</div>
+      <div class="logo">东南易购</div>
       <el-input
         class="search-bar"
         placeholder="搜索商品"
