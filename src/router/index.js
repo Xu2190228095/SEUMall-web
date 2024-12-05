@@ -74,6 +74,11 @@ const router = new createRouter({
       name: 'pay',
       component: () => import('@/views/User/pay.vue')//个人信息界面
     },
+    {
+       path: '/homePage',     //根路径
+       name: 'homePage',  //路由名称
+       component: () => import('@/views/Shopping/homepage.vue') //路由组件
+    },
   ]
 })   //创建Router实例
 
