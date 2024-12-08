@@ -1,6 +1,4 @@
-import { createApp } from 'vue'
 import { createRouter, createWebHistory } from 'vue-router';
-import Sidebar from '@/views/admin/product/test_side_bar.vue'
 import Layout from '@/views/admin/layout/layout.vue'
 import HelloWorld from '@/components/HelloWorld.vue'  //引入根目录下的Hello.vue组件
 

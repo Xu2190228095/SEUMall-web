@@ -43,18 +43,26 @@
             </el-input>
           </el-form-item>
 
-          <el-form-item>
-            <el-radio-group v-model="loginForm.character" style="display: flex; justify-content: space-evenly; width: 100%;">
-                <el-radio value="商家">商家</el-radio>
-                <el-radio value="管理员">管理员</el-radio>
-            </el-radio-group>
+          <el-form-item prop="password">
+            <el-input name="password"
+                      :type="pwdType"
+                      @keyup.enter="handleLogin"
+                      v-model="loginForm.password"
+                      autoComplete="on"
+                      placeholder="请确认输入密码">
+            <template v-slot:prefix>
+              <svg-icon icon-class="password" class="color-main"></svg-icon>
+            </template>
+            <template v-slot:suffix>
+                <span @click="showPwd">
+                  <svg-icon icon-class="eye" class="color-main"></svg-icon>
+                </span>
+            </template>
+            </el-input>
           </el-form-item>
 
           <el-form-item style="margin-bottom: 60px;text-align: center">
-            <el-button style="width: 48%" type="primary" :loading="loading" @click.prevent="handleLogin">
-              登录
-            </el-button>
-            <el-button style="width: 48%" type="primary" @click.prevent="handleRegister">
+            <el-button style="width: 100%" type="primary" @click.prevent="handleRegister">
               注册
             </el-button>
           </el-form-item>
@@ -122,31 +130,7 @@
             this.pwdType = 'password'
           }
         },
-        handleLogin() {
-          this.$refs.loginForm.validate(valid => {
-            if (valid) {
-              // let isSupport = getSupport();
-              // if(isSupport===undefined||isSupport==null){
-              //   this.dialogVisible =true;
-              //   return;
-              // }
-              this.loading = true;
-              this.$store.dispatch('Login', this.loginForm).then(() => {
-                this.loading = false;
-                setCookie("username",this.loginForm.username,15);
-                setCookie("password",this.loginForm.password,15);
-                this.$router.push({path: '/'})
-              }).catch(() => {
-                this.loading = false
-              })
-            } else {
-              console.log('参数验证不合法！');
-              return false
-            }
-          })
-        },
         handleRegister(){
-            this.$router.push({path: '/register'});
         }
       }
     }
