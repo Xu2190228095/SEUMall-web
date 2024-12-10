@@ -4,7 +4,7 @@
         <el-form autoComplete="on"
                  :model="loginForm"
                  :rules="loginRules"
-                 ref="loginForm"
+                 ref="loginFormRef"
                  label-position="left">
                  
           <div style="text-align: center">
@@ -17,7 +17,6 @@
             <el-input name="username"
                       type="text"
                       v-model="loginForm.username"
-                      autoComplete="on"
                       placeholder="请输入用户名">
             <template v-slot:prefix>
                 <svg-icon icon-class="user" class="color-main"></svg-icon>
@@ -30,7 +29,6 @@
                       :type="pwdType"
                       @keyup.enter="handleLogin"
                       v-model="loginForm.password"
-                      autoComplete="on"
                       placeholder="请输入密码">
             <template v-slot:prefix>
               <svg-icon icon-class="password" class="color-main"></svg-icon>
@@ -66,90 +64,165 @@
   </template>
   
   <script>
-    import {isvalidUsername} from '@/utils/validate';
-    import {setSupport,getSupport,setCookie,getCookie} from '@/utils/support';
-    import login_center_bg from '@/assets/images/login_center_bg.png'
-  
-    export default {
-      name: 'login',
-      data() {
-        const validateUsername = (rule, value, callback) => {
-          if (!isvalidUsername(value)) {
-            callback(new Error('请输入正确的用户名'))
-          } else {
-            callback()
-          }
-        };
-        const validatePass = (rule, value, callback) => {
-          if (value.length < 3) {
-            callback(new Error('密码不能小于3位'))
-          } else {
-            callback()
-          }
-        };
-        return {
-          loginForm: {
-            username: '',
-            password: '',
-            character: ''
-          },
-          loginRules: {
-            username: [{required: true, trigger: 'blur', validator: validateUsername}],
-            password: [{required: true, trigger: 'blur', validator: validatePass}]
-          },
-          loading: false,
-          pwdType: 'password',
-          login_center_bg,
-          dialogVisible:false,
-          supportDialogVisible:false
-        }
-      },
-      created() {
-        this.loginForm.username = getCookie("username");
-        this.loginForm.password = getCookie("password");
-        if(this.loginForm.username === undefined||this.loginForm.username==null||this.loginForm.username===''){
-          this.loginForm.username = 'admin';
-        }
-        if(this.loginForm.password === undefined||this.loginForm.password==null){
-          this.loginForm.password = '';
-        }
-      },
-      methods: {
-        showPwd() {
-          if (this.pwdType === 'password') {
-            this.pwdType = ''
-          } else {
-            this.pwdType = 'password'
-          }
-        },
-        handleLogin() {
-          this.$refs.loginForm.validate(valid => {
-            if (valid) {
-              // let isSupport = getSupport();
-              // if(isSupport===undefined||isSupport==null){
-              //   this.dialogVisible =true;
-              //   return;
-              // }
-              this.loading = true;
-              this.$store.dispatch('Login', this.loginForm).then(() => {
-                this.loading = false;
-                setCookie("username",this.loginForm.username,15);
-                setCookie("password",this.loginForm.password,15);
-                this.$router.push({path: '/'})
-              }).catch(() => {
-                this.loading = false
-              })
-            } else {
-              console.log('参数验证不合法！');
-              return false
-            }
-          })
-        },
-        handleRegister(){
-            this.$router.push({path: '/register'});
+  import { reactive, ref, onMounted, getCurrentInstance } from 'vue'
+  import { isvalidUsername } from '@/utils/validate'
+  import login_center_bg from '@/assets/images/login_center_bg.png'
+  import { useRouter } from 'vue-router'
+  import { login } from '@/api/login'
+
+  export default {
+    setup() {
+      const router = useRouter();
+
+      const loginForm = ref({
+        username: '',
+        password: '',
+        character: ''
+      })
+      const validateUsername = (rule, value, callback) => {
+        if (!isvalidUsername(value)) {
+          callback(new Error('请输入正确的用户名'))
+        } else {
+          callback()
         }
       }
+      const validatePass = (rule, value, callback) => {
+        if (value.length < 3) {
+          callback(new Error('密码不能小于3位'))
+        } else {
+          callback()
+        }
+      }
+      const loginRules = {
+        username: [
+          { required: true, message: '请输入用户名', trigger: 'blur' },
+          { validator: validateUsername, trigger: 'blur' }
+        ],
+        password: [
+          { required: true, message: '请输入密码', trigger: 'blur' },
+          { validator: validatePass, trigger: 'blur' }
+        ]
+      }
+      const loading = ref(false)
+      const pwdType = ref('password')
+      const showPwd = () => {
+        if (pwdType.value === 'password') {
+          pwdType.value = ''
+        } else {
+          pwdType.value = 'password'
+        }
+      }
+
+      const loginFormRef = ref(null);
+      onMounted(() => {
+        console.log(loginFormRef);
+      });
+      const handleLogin = () => {
+        loginFormRef.value.validate(valid => {
+          if (valid) {
+            loading.value = true
+            login(loginForm.value).then(res => {
+              if (res.status === 200) {
+                router.push({ path: '/' })
+              } else {
+                console.error(res)
+              }
+              loading.value = false
+            }).catch(err => {
+              console.log(err)
+              loading.value = false
+            })
+          } else {
+            console.log('参数验证不合法！')
+            return false
+          } 
+        })
+      }
+      const handleRegister = () => {
+        router.push({ path: '/register' })
+      }
+      return {
+        loginForm,
+        loginFormRef,
+        loginRules,
+        loading,
+        pwdType,
+        showPwd,
+        handleLogin,
+        handleRegister,
+        login_center_bg
+      }
     }
+  }
+    // import {isvalidUsername} from '@/utils/validate';
+    // import login_center_bg from '@/assets/images/login_center_bg.png'
+    // import axios from 'axios';
+  
+    // export default {
+    //   name: 'login',
+    //   data() {
+    //     const validateUsername = (rule, value, callback) => {
+    //       if (!isvalidUsername(value)) {
+    //         callback(new Error('请输入正确的用户名'))
+    //       } else {
+    //         callback()
+    //       }
+    //     };
+    //     const validatePass = (rule, value, callback) => {
+    //       if (value.length < 3) {
+    //         callback(new Error('密码不能小于3位'))
+    //       } else {
+    //         callback()
+    //       }
+    //     };
+    //     return {
+    //       loginForm: {
+    //         username: '',
+    //         password: '',
+    //         character: ''
+    //       },
+    //       loginRules: {
+    //         username: [{required: true, trigger: 'blur', validator: validateUsername}],
+    //         password: [{required: true, trigger: 'blur', validator: validatePass}]
+    //       },
+    //       loading: false,
+    //       pwdType: 'password',
+    //       login_center_bg,
+    //     }
+    //   },
+    //   created() {
+    //   },
+    //   methods: {
+    //     showPwd() {
+    //       if (this.pwdType === 'password') {
+    //         this.pwdType = ''
+    //       } else {
+    //         this.pwdType = 'password'
+    //       }
+    //     },
+    //     handleLogin() {
+    //       this.$refs.loginForm.validate(valid => {
+    //         if (valid) {
+    //           axios.post('/login', this.loginForm).then(res => {
+    //             if (res.data.code === 200) {
+    //               this.$router.push({path: '/'})
+    //             } else {
+    //               this.$message.error(res.data.msg);
+    //             }
+    //           }).catch(err => {
+    //             console.log(err);
+    //           })
+    //         } else {
+    //           console.log('参数验证不合法！');
+    //           return false
+    //         }
+    //       })
+    //     },
+    //     handleRegister(){
+    //         this.$router.push({path: '/register'});
+    //     }
+    //   }
+    // }
   </script>
   
   <style scoped>

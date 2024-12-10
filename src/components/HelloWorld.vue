@@ -8,16 +8,18 @@
 
 <script>
 
-import {ref, onMounted} from 'vue'
-import axios from 'axios' // 确保你已经安装了 axios 或其他 HTTP 客户端
+import {ref, onMounted, getCurrentInstance} from 'vue'
 
 export default {
   setup() {
     const tableData = ref([])
 
+    const instance = getCurrentInstance();
+    const $axios = instance.appContext.config.globalProperties.$axios;
+
     onMounted(async () => {
       try {
-        const response = await axios.get('http://localhost:8080/dept/list')
+        const response = await $axios.get('/dept/list')
         tableData.value = response.data
       } catch (error) {
         console.error('Failed to fetch data:', error)

@@ -6,8 +6,10 @@ import router from './router'
 import '@/styles/index.scss' // global css
 import SvgIcon from '@/components/SvgIcon/index.vue' // svg component
 import "virtual:svg-icons-register";
+import axios from './api/axios'
 
 const app = createApp(App);  // 创建 Vue 应用
+app.config.globalProperties.$axios = axios;
 app.component('svg-icon', SvgIcon)
 app.use(ElementPlus);
 app.use(router); // 使用路由实例
