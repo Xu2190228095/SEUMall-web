@@ -34,11 +34,6 @@ const router = new createRouter({
       {
           path: '/admin',
           name: 'Admin',
-          component: () => import('@/views/admin/index.vue')
-      },
-      {
-          path: '/test',
-          name: 'Test',
           component: Layout,
           children: [{
               path: 'product_info',
@@ -61,6 +56,11 @@ const router = new createRouter({
               component: () => import('@/views/admin/product/RefundDeal.vue'),
           },
           ]
+      },
+      {
+          path: '/adminInfo',
+          name: 'adminInfo',
+          component: () => import('@/views/admin/user/SellerInfo.vue'),
       },
     {
         path: '/productInterface',
