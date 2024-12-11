@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Layout from '@/views/admin/layout/layout2.vue'
+import Layout from '@/views/admin/layout/layout.vue'
 import HelloWorld from '@/components/HelloWorld.vue'  //引入根目录下的Hello.vue组件
 
 const router = new createRouter({
