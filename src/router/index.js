@@ -58,8 +58,8 @@ const router = new createRouter({
           ]
       },
       {
-          path: '/adminInfo',
-          name: 'adminInfo',
+          path: '/sellerInfo',
+          name: 'sellerInfo',
           component: () => import('@/views/admin/user/SellerInfo.vue'),
       },
     {
