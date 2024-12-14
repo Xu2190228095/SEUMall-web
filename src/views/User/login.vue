@@ -43,8 +43,8 @@
 
           <el-form-item>
             <el-radio-group v-model="loginForm.character" style="display: flex; justify-content: space-evenly; width: 100%;">
-                <el-radio value="商家">商家</el-radio>
-                <el-radio value="管理员">管理员</el-radio>
+                <el-radio value="ROLE_user">商家</el-radio>
+                <el-radio value="ROLE_admin">管理员</el-radio>
             </el-radio-group>
           </el-form-item>
 
@@ -60,18 +60,28 @@
       </el-card>
 
       <img :src="login_center_bg" class="login-center-layout">
+
+      <!-- 弹窗 -->
+      <div v-if="showError" class="modal-overlay">
+        <div class="modal">
+          <p>密码不正确，请重新输入。</p>
+          <el-button @click="closeModal">关闭</el-button>
+        </div>
+      </div>
     </div>
   </template>
   
   <script>
   import { reactive, ref, onMounted, getCurrentInstance } from 'vue'
   import { isvalidUsername } from '@/utils/validate'
+  import { setToken } from '@/utils/auth'
   import login_center_bg from '@/assets/images/login_center_bg.png'
   import { useRouter } from 'vue-router'
   import { login } from '@/api/login'
 
   export default {
     setup() {
+      const showError = ref(false);
       const router = useRouter();
 
       const loginForm = ref({
@@ -121,10 +131,14 @@
         loginFormRef.value.validate(valid => {
           if (valid) {
             loading.value = true
+            console.log(loginForm.value)
             login(loginForm.value).then(res => {
               if (res.status === 200) {
-                router.push({ path: '/' })
+                router.push({ path: '/home' })
+                console.log(res)
+                setToken(res.data.jwt)
               } else {
+                showError.value = true
                 console.error(res)
               }
               loading.value = false
@@ -141,6 +155,9 @@
       const handleRegister = () => {
         router.push({ path: '/register' })
       }
+      const closeModal = () => {
+        showError = false;  // 关闭弹窗
+      }
       return {
         loginForm,
         loginFormRef,
@@ -150,7 +167,9 @@
         showPwd,
         handleLogin,
         handleRegister,
-        login_center_bg
+        login_center_bg,
+        showError,  // 控制弹窗的显示
+        closeModal
       }
     }
   }
@@ -247,5 +266,25 @@
       max-height: 100%;
       margin-top: 200px;
     }
+    /* 弹窗样式 */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .modal {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    width: 300px;
+    text-align: center;
+  }
   </style>
   

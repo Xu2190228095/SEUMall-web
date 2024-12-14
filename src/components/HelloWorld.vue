@@ -16,7 +16,6 @@ import {ref, onMounted, getCurrentInstance} from 'vue'
 export default {
   setup() {
     const tableData = ref([])
-
     const instance = getCurrentInstance();
     const $axios = instance.appContext.config.globalProperties.$axios;
 

@@ -10,11 +10,11 @@ const router = new createRouter({
       name: 'Hello',  //路由名称
       component: HelloWorld,  //路由组件
     },
-    {
-        path: '/home',
-        name: 'Home',
-        component: () => import('@/views/home/index.vue')  //懒加载
-    },
+    // {
+    //     path: '/home',
+    //     name: 'Home',
+    //     component: () => import('@/views/home/index.vue')  //懒加载
+    // },
     {
         path: '/login',
         name: 'Login',
