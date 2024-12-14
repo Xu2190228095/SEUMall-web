@@ -54,6 +54,19 @@
                 </el-menu-item>
               </el-menu-item-group>
             </el-sub-menu>
+            <el-sub-menu index="3">
+              <template #title>
+                <el-icon><setting /></el-icon>用户管理
+              </template>
+              <el-menu-item-group>
+                <el-menu-item index="3-1">
+                  <router-link to="">用户列表</router-link>
+                </el-menu-item>
+                <el-menu-item index="3-2">
+                  <router-link to="">权限管理</router-link>
+                </el-menu-item>
+              </el-menu-item-group>
+            </el-sub-menu>
           </el-menu>
         </el-scrollbar>
       </el-aside>
