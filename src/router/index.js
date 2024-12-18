@@ -13,7 +13,7 @@ const router = new createRouter({
     {
         path: '/home',
         name: 'Home',
-        component: () => import('@/views/home/index.vue')  //懒加载
+        component: () => import('@/views/admin/layout/layout2.vue')  //懒加载
     },
     {
         path: '/login',
