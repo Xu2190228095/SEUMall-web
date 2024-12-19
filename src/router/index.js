@@ -82,6 +82,18 @@ const router = new createRouter({
        name: 'homePage',  //路由名称
        component: () => import('@/views/Shopping/homepage.vue') //路由组件
     },
+    {
+        path: '/productSearch',  // 搜索商品页面路径
+        name: 'productSearch',
+        component: () => import('@/views/Shopping/productSearch.vue'),  // 新增的商品搜索结果页面
+        props: route => ({ query: route.query.q })  // 获取查询参数
+    },
+    {
+         path: '/productDetail/:id',  // 搜索商品页面路径
+         name: 'productDetail',
+         component: () => import('@/views/Shopping/productDetail.vue'),  // 新增的商品搜索结果页面
+         props: true  // 自动将路由参数传递给组件
+    },
   ]
 })   //创建Router实例
 
