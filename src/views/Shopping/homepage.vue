@@ -136,6 +136,11 @@ export default {
       }
     };
   },
+  watch: {
+      '$route.query.productname'(newQuery) {
+        this.searchQuery = newQuery || '';  // 同步路由查询参数到搜索框
+      }
+    },
   methods: {
     search() {
       const query = this.searchQuery.trim();  // 获取去除空格的搜索关键词
