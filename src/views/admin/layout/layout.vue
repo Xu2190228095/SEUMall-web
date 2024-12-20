@@ -60,7 +60,7 @@
               </template>
               <el-menu-item-group>
                 <el-menu-item index="3-1">
-                  <router-link to="">用户列表</router-link>
+                  <router-link to="/admin/user_info">用户列表</router-link>
                 </el-menu-item>
                 <el-menu-item index="3-2">
                   <router-link to="">权限管理</router-link>

@@ -1,8 +1,9 @@
 <template>
   <div class="app-container">
+
     <el-card class="filter-container" shadow="never">
       <div>
-        <i class="el-icon-search"></i>
+        <!-- <i class="el-icon-search"></i> -->
         <span>筛选搜索</span>
         <el-button
           style="float:right"
@@ -21,55 +22,66 @@
       <div style="margin-top: 15px">
         <el-form :inline="true" :model="listQuery" size="small" label-width="140px">
           <el-form-item label="输入搜索：">
-            <el-input v-model="keyword" class="input-width" placeholder="帐号/姓名" clearable></el-input>
+            <el-input v-model="listQuery.username" class="input-width" placeholder="请输入帐号" clearable></el-input>
           </el-form-item>
         </el-form>
       </div>
     </el-card>
+
     <el-card class="operate-container" shadow="never">
-      <i class="el-icon-tickets"></i>
+      <!-- <i class="el-icon-tickets"></i> -->
       <span>数据列表</span>
-      <el-button size="mini" class="btn-add" @click="handleAdd()" style="margin-left: 20px">添加</el-button>
+      <el-button size="mini" class="btn-add" @click="handleAdd()" style="float:right">添加</el-button>
     </el-card>
+
     <div class="table-container">
       <el-table ref="adminTable"
                 :data="list"
                 style="width: 100%;"
                 v-loading="listLoading" border>
         <el-table-column label="编号" width="100" align="center">
-          <template slot-scope="scope">{{scope.row.id}}</template>
+          <template #default="scope">{{scope.row.uid}}</template>
         </el-table-column>
+
         <el-table-column label="帐号" align="center">
-          <template slot-scope="scope">{{scope.row.username}}</template>
+          <template #default="scope">{{scope.row.username}}</template>
         </el-table-column>
-        <el-table-column label="姓名" align="center">
-          <template slot-scope="scope">{{scope.row.nickName}}</template>
+
+        <el-table-column label="角色" align="center">
+          <template #default="scope">
+            <div>
+            <!-- 根据 scope.row.character 显示不同内容 -->
+            <span v-if="scope.row.character === 'ROLE_admin'">管理员</span>
+            <span v-else-if="scope.row.character === 'ROLE_user'">商家</span>
+            <span v-else>未知角色</span>
+          </div>
+          </template>
         </el-table-column>
+        
         <el-table-column label="邮箱" align="center">
-          <template slot-scope="scope">{{scope.row.email}}</template>
+          <template #default="scope">{{scope.row.email}}</template>
         </el-table-column>
+
         <el-table-column label="添加时间" width="160" align="center">
-          <template slot-scope="scope">{{scope.row.createTime | formatDateTime}}</template>
+          <template #default="scope">{{scope.row.createTime}}</template>
         </el-table-column>
+
         <el-table-column label="最后登录" width="160" align="center">
-          <template slot-scope="scope">{{scope.row.loginTime | formatDateTime}}</template>
+          <template #default="scope">{{scope.row.lastLoginTime}}</template>
         </el-table-column>
+
         <el-table-column label="是否启用" width="140" align="center">
-          <template slot-scope="scope">
+          <template #default="scope">
             <el-switch
               @change="handleStatusChange(scope.$index, scope.row)"
-              :active-value="1"
-              :inactive-value="0"
-              v-model="scope.row.status">
+              :active-value=true
+              :inactive-value=false
+              v-model="scope.row.isActive">
             </el-switch>
           </template>
         </el-table-column>
         <el-table-column label="操作" width="180" align="center">
-          <template slot-scope="scope">
-            <el-button size="mini"
-                       type="text"
-                       @click="handleSelectRole(scope.$index, scope.row)">分配角色
-            </el-button>
+          <template #default="scope">
             <el-button size="mini"
                        type="text"
                        @click="handleUpdate(scope.$index, scope.row)">
@@ -89,15 +101,17 @@
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         layout="total, sizes,prev, pager, next,jumper"
-        :current-page.sync="pageNum"
-        :page-size="pageSize"
-        :page-sizes="[10,15,20]"
-        :total="total">
+        v-model:current-page="listQuery.pageNum"
+        v-model:page-size="listQuery.pageSize"
+        :page-sizes="[5,10,15,20]"
+        v-model:total="total">
       </el-pagination>
     </div>
+
     <el-dialog
       :title="isEdit?'编辑用户':'添加用户'"
-      :visible.sync="dialogVisible"
+      v-model="dialogVisible"
+      align-center
       width="40%">
       <el-form :model="admin"
                ref="adminForm"
@@ -105,25 +119,16 @@
         <el-form-item label="帐号：">
           <el-input v-model="admin.username" style="width: 250px"></el-input>
         </el-form-item>
-        <el-form-item label="姓名：">
-          <el-input v-model="admin.nickName" style="width: 250px"></el-input>
-        </el-form-item>
         <el-form-item label="邮箱：">
           <el-input v-model="admin.email" style="width: 250px"></el-input>
         </el-form-item>
         <el-form-item label="密码：">
           <el-input v-model="admin.password"  type="password" style="width: 250px"></el-input>
         </el-form-item>
-        <el-form-item label="备注：">
-          <el-input v-model="admin.note"
-                    type="textarea"
-                    :rows="5"
-                    style="width: 250px"></el-input>
-        </el-form-item>
         <el-form-item label="是否启用：">
-          <el-radio-group v-model="admin.status">
-            <el-radio :label="1">是</el-radio>
-            <el-radio :label="0">否</el-radio>
+          <el-radio-group v-model="admin.isActive">
+            <el-radio :label=true>是</el-radio>
+            <el-radio :label=false>否</el-radio>
           </el-radio-group>
         </el-form-item>
       </el-form>
@@ -132,26 +137,182 @@
         <el-button type="primary" @click="handleDialogConfirm()" size="small">确 定</el-button>
       </span>
     </el-dialog>
-    <el-dialog
-      title="分配角色"
-      :visible.sync="allocDialogVisible"
-      width="30%">
-      <el-select v-model="allocRoleIds" multiple placeholder="请选择" size="small" style="width: 80%">
-        <el-option
-          v-for="item in allRoleList"
-          :key="item.id"
-          :label="item.name"
-          :value="item.id">
-        </el-option>
-      </el-select>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="allocDialogVisible = false" size="small">取 消</el-button>
-        <el-button type="primary" @click="handleAllocDialogConfirm()" size="small">确 定</el-button>
-      </span>
-    </el-dialog>
+
   </div>
 </template>
 <script>
+  import { user_info } from '../../../api/UserInfo';
+  import { reactive, ref, onMounted, getCurrentInstance } from 'vue'
+  import { fetchList , deleteUser, addUser, updateUser} from '@/api/user'
+
+  export default {
+    setup() {
+      const list = ref([
+        // {
+        //   uid: '1',
+        //   username: 'admin',
+        //   email: 'test@qq.com',
+        //   createTime: '2017-01-01 00:00:00',
+        //   lastLoginTime: '2018-01-01 00:00:00',
+        //   isActive: true,
+        // },
+        // {
+        //   uid: '2',
+        //   username: 'seller',
+        //   email: '111',
+        //   createTime: '111',
+        //   lastLoginTime: '111',
+        //   isActive: true,
+        // },
+        // {
+        //   uid: '3',
+        //   username: 'seller',
+        //   email: '111',
+        //   createTime: '111',
+        //   lastLoginTime: '111',
+        //   isActive: true,
+        // },
+        // {
+        //   uid: '4',
+        //   username: 'seller',
+        //   email: '111',
+        //   createTime: '111',
+        //   lastLoginTime: '111',
+        //   isActive: true,
+        // },
+        // {
+        //   uid: '5',
+        //   username: 'seller',
+        //   email: '111',
+        //   createTime: '111',
+        //   lastLoginTime: '111',
+        //   isActive: true,
+        // },
+        // {
+        //   uid: '6',
+        //   username: 'seller',
+        //   email: '111',
+        //   createTime: '111',
+        //   lastLoginTime: '111',
+        //   isActive: true,
+        // }
+      ]);
+      const isEdit = ref(false);
+      const dialogVisible = ref(false);
+      const admin = ref({
+        username: null,
+        password: null,
+        email: null,
+        isActive: true
+      });
+      const listQuery = ref({
+        pageNum: 1,
+        pageSize: 5,
+        username: null
+      });
+      const total = ref(6);
+      const listLoading = ref(false);
+      onMounted(() => {
+        getList();
+      });
+      function handleStatusChange(index, row) {
+        console.log(index, row);  //to do
+      }
+      function handleDelete(index, row) {
+        console.log(index, row);  //to do
+        const uid = {
+          uid: row.uid
+        }
+        deleteUser(uid).then(response => {
+        }).catch(error => {
+          console.log(error);
+        });
+        getList();
+      }
+      function handleUpdate(index, row) {
+        isEdit.value = true;
+        dialogVisible.value = true;
+        admin.value = row;//Object.assign({}, row);  //深拷贝
+        admin.value.password = '*********';
+      }
+      function handleAdd() {
+        isEdit.value = false;
+        dialogVisible.value = true;
+        admin.value = {
+          username: null,
+          password: null,
+          email: null,
+          isActive: true
+        };
+      }
+      function handleDialogConfirm() {
+        if(isEdit.value == true){
+          updateUser(admin.value).then(response => {
+            dialogVisible.value = false;
+            getList();
+          }).catch(error => {
+            console.log(error);
+          });
+        }else{
+          addUser(admin.value).then(response => {
+            dialogVisible.value = false;
+            getList();
+          }).catch(error => {
+            console.log(error);
+          });
+        }
+        dialogVisible.value = false;
+      }
+      function handleSizeChange(val) {
+        listQuery.value.pageNum = 1;
+        listQuery.value.pageSize = val;
+        getList();
+      }
+      function handleCurrentChange(val) {
+        listQuery.value.pageNum = val;
+        getList();
+      }
+      function handleResetSearch() {
+        listQuery.value.pageNum = 1;
+        listQuery.value.username = null;
+        getList();
+      }
+      function handleSearchList() {
+        listQuery.value.pageNum = 1;
+        getList();
+      }
+      function getList(){
+        listLoading.value = true;
+        console.log(listQuery.value);
+        fetchList(listQuery.value).then(response => {
+          listLoading.value = false;
+          list.value = response.data.list;
+          total.value = response.data.total;
+        }).catch(error => {
+          console.log(error);
+          listLoading.value = true;
+        });
+      }
+      return {
+        list,
+        isEdit,
+        dialogVisible,
+        admin,
+        listQuery,
+        total,
+        listLoading,
+        handleStatusChange,
+        handleDelete,
+        handleUpdate,
+        handleAdd,
+        handleDialogConfirm,
+        handleSizeChange,
+        handleCurrentChange,
+        handleResetSearch,
+        handleSearchList,
+      }
+    }
+  }
   // import {fetchList,createAdmin,updateAdmin,updateStatus,deleteAdmin,getRoleByAdmin,allocRole} from '@/api/login';
   // import {fetchAllRoleList} from '@/api/role';
   // import {formatDate} from '@/utils/date';
@@ -159,7 +320,7 @@
   // const defaultListQuery = {
   //   pageNum: 1,
   //   pageSize: 10,
-  //   keyword: null
+  //   username: null
   // };
   // const defaultAdmin = {
   //   id: null,
@@ -288,52 +449,13 @@
   //           })
   //         }
   //       })
-  //     },
-  //     handleAllocDialogConfirm(){
-  //       this.$confirm('是否要确认?', '提示', {
-  //         confirmButtonText: '确定',
-  //         cancelButtonText: '取消',
-  //         type: 'warning'
-  //       }).then(() => {
-  //         let params = new URLSearchParams();
-  //         params.append("adminId", this.allocAdminId);
-  //         params.append("roleIds", this.allocRoleIds);
-  //         allocRole(params).then(response => {
-  //           this.$message({
-  //             message: '分配成功！',
-  //             type: 'success'
-  //           });
-  //           this.allocDialogVisible = false;
-  //         })
-  //       })
-  //     },
-  //     handleSelectRole(index,row){
-  //       this.allocAdminId = row.id;
-  //       this.allocDialogVisible = true;
-  //       this.getRoleListByAdmin(row.id);
-  //     },
+  //     }
   //     getList() {
   //       this.listLoading = true;
   //       fetchList(this.listQuery).then(response => {
   //         this.listLoading = false;
   //         this.list = response.data.list;
   //         this.total = response.data.total;
-  //       });
-  //     },
-  //     getAllRoleList() {
-  //       fetchAllRoleList().then(response => {
-  //         this.allRoleList = response.data;
-  //       });
-  //     },
-  //     getRoleListByAdmin(adminId) {
-  //       getRoleByAdmin(adminId).then(response => {
-  //         let allocRoleList = response.data;
-  //         this.allocRoleIds=[];
-  //         if(allocRoleList!=null&&allocRoleList.length>0){
-  //           for(let i=0;i<allocRoleList.length;i++){
-  //             this.allocRoleIds.push(allocRoleList[i].id);
-  //           }
-  //         }
   //       });
   //     }
   //   }

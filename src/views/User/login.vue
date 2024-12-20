@@ -77,7 +77,7 @@
   import { setToken } from '@/utils/auth'
   import login_center_bg from '@/assets/images/login_center_bg.png'
   import { useRouter } from 'vue-router'
-  import { login } from '@/api/login'
+  import { auth,login } from '@/api/login'
 
   export default {
     setup() {
@@ -123,6 +123,7 @@
         }
       }
 
+      const token = ref(null)
       const loginFormRef = ref(null);
       onMounted(() => {
         console.log(loginFormRef);
@@ -132,16 +133,28 @@
           if (valid) {
             loading.value = true
             console.log(loginForm.value)
-            login(loginForm.value).then(res => {
+            auth(loginForm.value).then(res => {
               if (res.status === 200) {
-                router.push({ path: '/home' })
-                console.log(res)
-                setToken(res.data.jwt)
+                token.value = res.data.jwt
               } else {
                 showError.value = true
                 console.error(res)
               }
-              loading.value = false
+            }).catch(err => {
+              console.log(err)
+            })
+            login(loginForm.value).then(res => {
+              if (res.status === 200) {
+                  if(res.data != -1){
+                    setToken(token.value)
+                    router.push({ path: '/admin' })
+                  }else{
+                    console.log("未激活")
+                  }
+                } else {
+                  console.error(res)
+                }
+                loading.value = false
             }).catch(err => {
               console.log(err)
               loading.value = false

@@ -39,22 +39,27 @@ const router = new createRouter({
               path: 'product_info',
               name: 'product_info',
               component: () => import('@/views/admin/product/ProductInfo.vue'),
-          },
-          {
-              path: 'product_add',
-              name: 'product_add',
-              component: () => import('@/views/admin/product/AddProduct.vue'),
-          },
-          {
-              path: 'order_info',
-              name: 'order_info',
-              component: () => import('@/views/admin/product/OrderInfo.vue'),
-          },
-          {
-              path: 'refund_deal',
-              name: 'refund_deal',
-              component: () => import('@/views/admin/product/RefundDeal.vue'),
-          },
+            },
+            {
+                path: 'product_add',
+                name: 'product_add',
+                component: () => import('@/views/admin/product/AddProduct.vue'),
+            },
+            {
+                path: 'order_info',
+                name: 'order_info',
+                component: () => import('@/views/admin/product/OrderInfo.vue'),
+            },
+            {
+                path: 'refund_deal',
+                name: 'refund_deal',
+                component: () => import('@/views/admin/product/RefundDeal.vue'),
+            },
+            {
+              path: 'user_info',
+              name: 'user_info',
+              component: () => import('@/views/admin/user/userManage.vue'),
+            }
           ]
       },
       {
