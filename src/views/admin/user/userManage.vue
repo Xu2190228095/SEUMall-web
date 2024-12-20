@@ -20,7 +20,7 @@
         </el-button>
       </div>
       <div style="margin-top: 15px">
-        <el-form :inline="true" :model="listQuery" size="small" label-width="140px">
+        <el-form :inline="true" :model="listQuery" label-width="140px">
           <el-form-item label="输入搜索：">
             <el-input v-model="listQuery.username" class="input-width" placeholder="请输入帐号" clearable></el-input>
           </el-form-item>
@@ -210,7 +210,7 @@
         pageSize: 5,
         username: null
       });
-      const total = ref(6);
+      const total = ref(0);
       const listLoading = ref(false);
       onMounted(() => {
         getList();
@@ -233,7 +233,7 @@
         isEdit.value = true;
         dialogVisible.value = true;
         admin.value = row;//Object.assign({}, row);  //深拷贝
-        admin.value.password = '*********';
+        admin.value.password = null;
       }
       function handleAdd() {
         isEdit.value = false;
@@ -283,14 +283,15 @@
       }
       function getList(){
         listLoading.value = true;
-        console.log(listQuery.value);
         fetchList(listQuery.value).then(response => {
           listLoading.value = false;
           list.value = response.data.list;
           total.value = response.data.total;
+          console.log(list.value)
+          console.log(total.value)
         }).catch(error => {
           console.log(error);
-          listLoading.value = true;
+          listLoading.value = false;
         });
       }
       return {

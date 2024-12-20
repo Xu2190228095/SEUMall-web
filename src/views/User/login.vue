@@ -147,7 +147,12 @@
               if (res.status === 200) {
                   if(res.data != -1){
                     setToken(token.value)
-                    router.push({ path: '/admin' })
+                    if(loginForm.value.character === "ROLE_user"){
+                      router.push({ path: '/admin/order_info' })
+                    }
+                    else{
+                      router.push({ path: '/adminUser/user_info' })
+                    }
                   }else{
                     console.log("未激活")
                   }
