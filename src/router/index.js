@@ -89,10 +89,10 @@ const router = new createRouter({
         props: route => ({ query: route.query.q })  // 获取查询参数
     },
     {
-         path: '/productDetail/:id',  // 搜索商品页面路径
+         path: '/productDetail',
          name: 'productDetail',
          component: () => import('@/views/Shopping/productDetail.vue'),  // 新增的商品搜索结果页面
-         props: true  // 自动将路由参数传递给组件
+         props: route => ({ productid: route.query.productid })  // 使用查询参数传递
     },
   ]
 })   //创建Router实例

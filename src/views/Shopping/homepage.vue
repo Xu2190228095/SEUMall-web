@@ -63,7 +63,7 @@
         <!-- 用户信息 -->
         <div class="user-info">
           <el-avatar size="large" src="https://randomuser.me/api/portraits/men/41.jpg"></el-avatar>
-          <p class="user-name">用户名</p>
+          <p class="user-name">zhangsan</p>
           <el-button type="text">收藏夹</el-button>
           <el-button type="text">购物车</el-button>
         </div>
@@ -86,6 +86,12 @@ import productImage1 from '@/assets/images/1.png';
 import productImage2 from '@/assets/images/2.png';
 import productImage3 from '@/assets/images/3.png';
 import productImage4 from '@/assets/images/4.png';
+import productImage_chocolate from '@/assets/images/chocolate.jpg';
+import productImage_shoe from '@/assets/images/shoe.jpg';
+import productImage_sweatshirt from '@/assets/images/sweatshirt.jpg';
+import productImage_esteelauder from '@/assets/images/esteelauder.jpg';
+import productImage_pocket from '@/assets/images/pocket.jpg';
+
 
 
 export default {
@@ -117,10 +123,10 @@ export default {
       ],
       // 轮播图数据
       carouselItems: [
-        { name: 'iPhone 13', image: productImage1, link: 'https://www.apple.com/cn/iphone-13/' },
-        { name: 'MacBook Pro 16', image: productImage2, link: 'https://www.apple.com/cn/macbook-pro-16/' },
-        { name: 'AirPods Pro', image: productImage3, link: 'https://www.apple.com/cn/airpods-pro/' },
-        { name: '华为MateBook X Pro', image: productImage4, link: 'https://www.huawei.com/cn/laptops/matebook-x-pro' }
+        { name: 'esteelauder', image: productImage_esteelauder, link: 'https://www.apple.com/cn/iphone-13/' },
+        { name: 'DJIpocket', image: productImage_pocket, link: 'https://www.apple.com/cn/macbook-pro-16/' },
+        { name: 'chocolate', image: productImage_chocolate, link: 'https://www.apple.com/cn/airpods-pro/' },
+        { name: 'shoe', image: productImage_shoe, link: 'https://www.huawei.com/cn/laptops/matebook-x-pro' }
       ],
       // 热门商品数据
       hotProducts: [

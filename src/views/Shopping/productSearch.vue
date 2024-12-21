@@ -48,7 +48,7 @@
                   <p>{{ product.pname }}</p>
                   <p>数量: {{ product.number }}</p>
                   <p>价格: ¥{{ product.price }}</p>
-                  <el-button type="primary" size="small" :href="`/productDetail/${product.id}`">查看</el-button>
+                  <el-button type="primary" size="small" @click="gotoProducts(product)">查看</el-button>
                 </div>
               </el-card>
             </el-col>
@@ -66,6 +66,12 @@ import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
 import { search } from '@/api/product'
 import request from '@/api/axios';
+import productImage_chocolate from '@/assets/images/chocolate.jpg';
+import productImage_shoe from '@/assets/images/shoe.jpg';
+import productImage_sweatshirt from '@/assets/images/sweatshirt.jpg';
+import productImage_esteelauder from '@/assets/images/esteelauder.jpg';
+import productImage_pocket from '@/assets/images/pocket.jpg';
+
 
 export default {
   components: {
@@ -164,11 +170,28 @@ export default {
       }
     });
 
+    const gotoProducts = (product) => {
+      // 打印出 product 对象和 product.id
+      console.log('Product:', product);
+      console.log('Product ID:', product ? product.id : 'No ID');
+
+      if (product && product.id) {
+        // 确保 product.id 是有效的
+        router.push({ path: '/productDetail', query: { productid: product.id } });
+      } else {
+        console.error('Invalid product ID:', product);
+        ElMessage.error('商品 ID 无效');
+      }
+    };
+
+
+
     // 初始化：获取商品数据
     fetchProducts();
 
-    return { searchQuery, selectedSource, sortBy, filteredProducts, handleSort, searchProducts };
+    return { searchQuery, selectedSource, sortBy, filteredProducts, handleSort, searchProducts, gotoProducts };
   }
+
 };
 </script>
 
