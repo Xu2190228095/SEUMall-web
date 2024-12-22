@@ -134,7 +134,7 @@
             console.log(loginForm.value)
             login(loginForm.value).then(res => {
               if (res.status === 200) {
-                router.push({ path: '/home' })
+                router.push({ path: '/admin/product_info' })
                 console.log(res)
                 setToken(res.data.jwt)
               } else {

@@ -25,11 +25,11 @@
                 v-loading="listLoading"
                 border>
         <el-table-column type="selection" width="60" align="center"></el-table-column>
-        <el-table-column label="编号" width="100" align="center">
-          <template slot-scope="scope">{{scope.row.id}}</template>
+        <el-table-column prop="pid" label="编号" width="100" align="center">
+<!--          <template slot-scope="scope">{{scope.pid}}</template>-->
         </el-table-column>
         <el-table-column label="商品图片" width="120" align="center">
-          <template slot-scope="scope"><img style="height: 80px" :src="scope.row.pic" alt="none"></template>
+          <template slot-scope="scope"><img style="height: 80px" :src="scope.desc" alt="none"></template>
         </el-table-column>
         <el-table-column label="商品名称" align="center">
           <template slot-scope="scope">
@@ -120,6 +120,14 @@
         </el-table-column>
       </el-table>
     </div>
+    <el-table :data="tableData" style="width: 100%">
+      <!--    <el-table-column prop="deptno" label="deptno" width="180"></el-table-column>-->
+      <!--    <el-table-column prop="dname" label="dname" width="180"></el-table-column>-->
+      <!--    <el-table-column prop="loc" label="loc"></el-table-column>-->
+      <el-table-column prop="id" label="id" width="180"></el-table-column>
+      <el-table-column prop="pname" label="pname" width="180"></el-table-column>
+      <el-table-column prop="price" label="price"></el-table-column>
+    </el-table>
   </div>
 </template>
 
@@ -220,5 +228,32 @@
   font-size: 18px
 }
 </style>
-<script setup lang="ts">
+
+
+<script>
+
+import {ref, onMounted, getCurrentInstance} from 'vue'
+
+export default {
+  setup() {
+    const list = ref([])
+    const instance = getCurrentInstance();
+    const $axios = instance.appContext.config.globalProperties.$axios;
+
+    onMounted(async () => {
+      try {
+        const response = await $axios.get('/product/list')
+        list.value = response.data
+        // 在这里打印数据
+        console.log('Fetched Product Data:', list.value);
+      } catch (error) {
+        console.error('Failed to fetch data:', error)
+      }
+    })
+
+    return {
+      list
+    }
+  }
+};
 </script>
