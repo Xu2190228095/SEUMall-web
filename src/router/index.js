@@ -39,22 +39,38 @@ const router = new createRouter({
               path: 'product_info',
               name: 'product_info',
               component: () => import('@/views/admin/product/ProductInfo.vue'),
-          },
-          {
-              path: 'product_add',
-              name: 'product_add',
-              component: () => import('@/views/admin/product/AddProduct.vue'),
-          },
-          {
+            },
+            {
+                path: 'product_add',
+                name: 'product_add',
+                component: () => import('@/views/admin/product/AddProduct.vue'),
+            },
+            {
+                path: 'refund_deal',
+                name: 'refund_deal',
+                component: () => import('@/views/admin/product/RefundDeal.vue'),
+            },
+            {
               path: 'order_info',
               name: 'order_info',
-              component: () => import('@/views/admin/product/OrderInfo.vue'),
+              component: () => import('@/views/admin/order/orderInfo.vue'),
+            },
+            {
+              path: 'order_detail',
+              name: 'order_detail',
+              component: () => import('@/views/admin/order/orderDetail.vue'),
           },
-          {
-              path: 'refund_deal',
-              name: 'refund_deal',
-              component: () => import('@/views/admin/product/RefundDeal.vue'),
-          },
+          ]
+      },
+      {
+          path: '/adminUser',
+          name: 'adminUser',
+          component: () => import('@/views/admin/layout/layout2.vue'),
+          children: [{
+            path: 'user_info',
+            name: 'user_info',
+            component: () => import('@/views/admin/user/userManage.vue'),
+            },
           ]
       },
       {
@@ -81,6 +97,18 @@ const router = new createRouter({
        path: '/homePage',     //根路径
        name: 'homePage',  //路由名称
        component: () => import('@/views/Shopping/homepage.vue') //路由组件
+    },
+    {
+        path: '/productSearch',  // 搜索商品页面路径
+        name: 'productSearch',
+        component: () => import('@/views/Shopping/productSearch.vue'),  // 新增的商品搜索结果页面
+        props: route => ({ query: route.query.q })  // 获取查询参数
+    },
+    {
+         path: '/productDetail',
+         name: 'productDetail',
+         component: () => import('@/views/Shopping/productDetail.vue'),  // 新增的商品搜索结果页面
+         props: route => ({ productid: route.query.productid })  // 使用查询参数传递
     },
   ]
 })   //创建Router实例

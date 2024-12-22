@@ -4,7 +4,7 @@
         <el-form autoComplete="on"
                  :model="loginForm"
                  :rules="loginRules"
-                 ref="loginForm"
+                 ref="loginFormRef"
                  label-position="left">
                  
           <div style="text-align: center">
@@ -28,7 +28,6 @@
           <el-form-item prop="password">
             <el-input name="password"
                       :type="pwdType"
-                      @keyup.enter="handleLogin"
                       v-model="loginForm.password"
                       autoComplete="on"
                       placeholder="请输入密码">
@@ -43,11 +42,10 @@
             </el-input>
           </el-form-item>
 
-          <el-form-item prop="password">
+          <el-form-item prop="repassword">
             <el-input name="password"
                       :type="pwdType"
-                      @keyup.enter="handleLogin"
-                      v-model="loginForm.password"
+                      v-model="loginForm.repassword"
                       autoComplete="on"
                       placeholder="请确认输入密码">
             <template v-slot:prefix>
@@ -59,6 +57,13 @@
                 </span>
             </template>
             </el-input>
+          </el-form-item>
+
+          <el-form-item>
+            <el-radio-group v-model="loginForm.character" style="display: flex; justify-content: space-evenly; width: 100%;">
+                <el-radio value="ROLE_user">商家</el-radio>
+                <el-radio value="ROLE_admin">管理员</el-radio>
+            </el-radio-group>
           </el-form-item>
 
           <el-form-item style="margin-bottom: 60px;text-align: center">
@@ -74,66 +79,72 @@
   </template>
   
   <script>
-    import {isvalidUsername} from '@/utils/validate';
-    import {setSupport,getSupport,setCookie,getCookie} from '@/utils/support';
+    import { reactive, ref, onMounted, getCurrentInstance } from 'vue'
+    import { isvalidUsername } from '@/utils/validate'
     import login_center_bg from '@/assets/images/login_center_bg.png'
-  
+    import { register } from '@/api/login'
+    import router from '../../router';
+
     export default {
-      name: 'login',
-      data() {
-        const validateUsername = (rule, value, callback) => {
-          if (!isvalidUsername(value)) {
-            callback(new Error('请输入正确的用户名'))
+      setup() {
+        const loginForm = ref({
+          username: '',
+          password: '',
+          repassword: '',
+          character: ''
+        });
+        const loginRules = {
+          // username: [
+          //   { required: true, message: '请输入用户名', trigger: 'blur' },
+          //   { validator: isvalidUsername, trigger: 'blur' }
+          // ],
+          // password: [
+          //   { required: true, message: '请输入密码', trigger: 'blur' },
+          //   { min: 6, max: 16, message: '密码长度在6到16位之间', trigger: 'blur' }
+          // ],
+          // repassword: [
+          //   { required: true, message: '请确认密码', trigger: 'blur' },
+          //   { min: 6, max: 16, message: '密码长度在6到16位之间', trigger: 'blur' }
+          // ]
+        };
+        const pwdType = ref('password');
+        const showPwd = () => {
+          if (pwdType.value === 'password') {
+            pwdType.value = 'text';
           } else {
-            callback()
+            pwdType.value = 'password';
           }
         };
-        const validatePass = (rule, value, callback) => {
-          if (value.length < 3) {
-            callback(new Error('密码不能小于3位'))
-          } else {
-            callback()
-          }
+
+        const loginFormRef = ref(null);
+        onMounted(() => {
+          console.log(loginFormRef);
+        });
+        const handleRegister = () => {
+          register(loginForm.value).then(res => {
+            if (res.status === 200) {
+              console.log(res);
+              if(res.data == -1){
+                console.log("用户名已存在");
+              }else{
+                router.push('/login');
+              }
+            };
+          }).catch(err => {
+            console.log(err);
+          });
         };
         return {
-          loginForm: {
-            username: '',
-            password: '',
-            character: ''
-          },
-          loginRules: {
-            username: [{required: true, trigger: 'blur', validator: validateUsername}],
-            password: [{required: true, trigger: 'blur', validator: validatePass}]
-          },
-          loading: false,
-          pwdType: 'password',
-          login_center_bg,
-          dialogVisible:false,
-          supportDialogVisible:false
-        }
-      },
-      created() {
-        this.loginForm.username = getCookie("username");
-        this.loginForm.password = getCookie("password");
-        if(this.loginForm.username === undefined||this.loginForm.username==null||this.loginForm.username===''){
-          this.loginForm.username = 'admin';
-        }
-        if(this.loginForm.password === undefined||this.loginForm.password==null){
-          this.loginForm.password = '';
-        }
-      },
-      methods: {
-        showPwd() {
-          if (this.pwdType === 'password') {
-            this.pwdType = ''
-          } else {
-            this.pwdType = 'password'
-          }
-        },
-        handleRegister(){
-        }
+          loginForm,
+          loginRules,
+          pwdType,
+          showPwd,
+          handleRegister,
+          login_center_bg
+        };
       }
     }
+
   </script>
   
   <style scoped>

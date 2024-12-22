@@ -4,13 +4,18 @@
     <el-header class="header">
       <div class="logo">东南易购</div>
       <el-input
+        v-model="searchQuery"
         class="search-bar"
         placeholder="搜索商品"
         prefix-icon="el-icon-search"
         style="width: 300px; height: 40px;"
+        @keyup.enter="search"
       >
         <template #append>
-          <el-button type="primary" :icon="Search" style="height: 100%; padding: 0 10px;">
+          <el-button
+            type="primary"
+            @click="search"
+            style="height: 100%; padding: 0 10px;">
             搜索
           </el-button>
         </template>
@@ -18,7 +23,7 @@
     </el-header>
 
     <el-container>
-      <!-- 左侧商品分类树 -->
+      <!-- 左侧，商品分类树 -->
       <el-aside width="200px" class="sidebar">
         <el-tree
           :data="categories"
@@ -32,7 +37,7 @@
         <!-- 轮播图展示 -->
         <el-carousel :interval="4000" arrow="always" type="card" class="carousel">
           <el-carousel-item v-for="(item, index) in carouselItems" :key="index">
-            <img :src="item.image" alt="Carousel Image" />
+            <img :src="item.image" alt="轮播图" />
           </el-carousel-item>
         </el-carousel>
 
@@ -53,12 +58,12 @@
         </div>
       </el-main>
 
-      <!-- 右侧用户信息和侧边栏 -->
+      <!-- 右侧，用户信息与侧边栏 -->
       <el-aside width="300px" class="right-sidebar">
         <!-- 用户信息 -->
         <div class="user-info">
           <el-avatar size="large" src="https://randomuser.me/api/portraits/men/41.jpg"></el-avatar>
-          <p class="user-name">用户名</p>
+          <p class="user-name">zhangsan</p>
           <el-button type="text">收藏夹</el-button>
           <el-button type="text">购物车</el-button>
         </div>
@@ -76,11 +81,18 @@
 
 <script>
 import { ElContainer, ElHeader, ElInput, ElAside, ElMain, ElCarousel, ElCarouselItem, ElTree, ElRow, ElCol, ElCard, ElButton, ElAvatar, ElMenu, ElMenuItem } from 'element-plus';
-import { Search } from '@element-plus/icons-vue';
+import { useRouter } from 'vue-router';  // 引入useRouter钩子
 import productImage1 from '@/assets/images/1.png';
 import productImage2 from '@/assets/images/2.png';
 import productImage3 from '@/assets/images/3.png';
 import productImage4 from '@/assets/images/4.png';
+import productImage_chocolate from '@/assets/images/chocolate.jpg';
+import productImage_shoe from '@/assets/images/shoe.jpg';
+import productImage_sweatshirt from '@/assets/images/sweatshirt.jpg';
+import productImage_esteelauder from '@/assets/images/esteelauder.jpg';
+import productImage_pocket from '@/assets/images/pocket.jpg';
+
+
 
 export default {
   components: {
@@ -98,11 +110,11 @@ export default {
     ElButton,
     ElAvatar,
     ElMenu,
-    ElMenuItem,
-    Search
+    ElMenuItem
   },
   data() {
     return {
+      searchQuery: '',  // 存储搜索关键词
       // 商品分类数据
       categories: [
         { label: '电子产品', children: [{ label: '手机' }, { label: '电脑' }, { label: '耳机' }] },
@@ -111,10 +123,10 @@ export default {
       ],
       // 轮播图数据
       carouselItems: [
-        { name: 'iPhone 13', image: productImage1, link: 'https://www.apple.com/cn/iphone-13/' },
-        { name: 'MacBook Pro 16', image: productImage2, link: 'https://www.apple.com/cn/macbook-pro-16/' },
-        { name: 'AirPods Pro', image: productImage3, link: 'https://www.apple.com/cn/airpods-pro/' },
-        { name: '华为MateBook X Pro', image: productImage4, link: 'https://www.huawei.com/cn/laptops/matebook-x-pro' }
+        { name: 'esteelauder', image: productImage_esteelauder, link: 'https://www.apple.com/cn/iphone-13/' },
+        { name: 'DJIpocket', image: productImage_pocket, link: 'https://www.apple.com/cn/macbook-pro-16/' },
+        { name: 'chocolate', image: productImage_chocolate, link: 'https://www.apple.com/cn/airpods-pro/' },
+        { name: 'shoe', image: productImage_shoe, link: 'https://www.huawei.com/cn/laptops/matebook-x-pro' }
       ],
       // 热门商品数据
       hotProducts: [
@@ -129,6 +141,20 @@ export default {
         label: 'label'
       }
     };
+  },
+  watch: {
+      '$route.query.productname'(newQuery) {
+        this.searchQuery = newQuery || '';  // 同步路由查询参数到搜索框
+      }
+    },
+  methods: {
+    search() {
+      const query = this.searchQuery.trim();  // 获取去除空格的搜索关键词
+      if (query) {
+        console.log('keyword:', query);  // 打印出查询参数
+        this.$router.push({ path: '/productSearch', query: { productname: query } });  // 跳转到搜索结果页面，并传递查询参数
+      }
+    }
   }
 };
 </script>
