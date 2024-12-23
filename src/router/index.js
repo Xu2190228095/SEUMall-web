@@ -86,7 +86,7 @@ const router = new createRouter({
     {
         path: '/productInterface',
         name: 'productInterface',
-        component: () => import('@/views/User/productInterface.vue')//商品界面
+        component: () => import('@/views/User/goodsDetail.vue')//商品界面
     },
     {
       path: '/userInfo',
