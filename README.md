@@ -15,3 +15,5 @@ http://localhost:3000/admin/product_add //添加商品
 http://localhost:3000/admin/order_info //订单处理
 http://localhost:3000/admin/refund_deal //退款处理
 http://localhost:3000/adminInfo //商家个人信息
+http://localhost:3000/try_test
+http://localhost:3000/login
