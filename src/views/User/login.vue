@@ -62,12 +62,12 @@
       <img :src="login_center_bg" class="login-center-layout">
 
       <!-- 弹窗 -->
-      <div v-if="showError" class="modal-overlay">
+      <!-- <div v-if="showError" class="modal-overlay">
         <div class="modal">
           <p>密码不正确，请重新输入。</p>
           <el-button @click="closeModal">关闭</el-button>
         </div>
-      </div>
+      </div> -->
     </div>
   </template>
   
@@ -81,7 +81,7 @@
 
   export default {
     setup() {
-      const showError = ref(false);
+      //const showError = ref(false);
       const router = useRouter();
 
       const loginForm = ref({
@@ -137,7 +137,7 @@
               if (res.status === 200) {
                 token.value = res.data.jwt
               } else {
-                showError.value = true
+                //showError.value = true
                 console.error(res)
               }
             }).catch(err => {
@@ -174,7 +174,7 @@
         router.push({ path: '/register' })
       }
       const closeModal = () => {
-        showError = false;  // 关闭弹窗
+        //showError = false;  // 关闭弹窗
       }
       return {
         loginForm,
@@ -186,7 +186,7 @@
         handleLogin,
         handleRegister,
         login_center_bg,
-        showError,  // 控制弹窗的显示
+        //showError,  // 控制弹窗的显示
         closeModal
       }
     }

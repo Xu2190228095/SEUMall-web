@@ -13,3 +13,15 @@ export function search(data) {
          params: data
     });
 }
+
+export function getProductsByClass(data) {
+  return request({
+        url: '/product/findByProductClass',
+        method: 'get',
+        params: data,
+        headers: {
+            'Content-Type': 'text/plain'
+        },
+    });
+}
+

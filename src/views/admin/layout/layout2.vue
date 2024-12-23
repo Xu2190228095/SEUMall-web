@@ -26,7 +26,6 @@
 
     <el-container>
       <el-aside width="150px">
-        <el-scrollbar>
           <el-menu :default-openeds="['1']">
             <el-sub-menu index="1">
               <template #title>
@@ -42,7 +41,6 @@
               </el-menu-item-group>
             </el-sub-menu>
           </el-menu>
-        </el-scrollbar>
       </el-aside>
 
       <el-main>
@@ -87,4 +85,5 @@ import {Menu as IconMenu, Message, Setting} from '@element-plus/icons-vue'
   height: 100%;
   right: 20px;
 }
+
 </style>

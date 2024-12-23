@@ -2,6 +2,10 @@
   <div id="search-page">
     <!-- 顶部导航栏 -->
         <el-header class="header">
+          <el-button type="primary" 
+          class="menu-btn" 
+          style="margin-left: 10px;"
+          @click="$router.push('/homePage')">首页</el-button>
           <div class="logo">东南易购</div>
           <el-input
             v-model="searchQuery"
@@ -23,153 +27,49 @@
         </el-header>
 
     <el-container>
-      <el-aside width="200px" class="sidebar">
-        <!-- 筛选商品来源 -->
-        <el-select v-model="selectedSource" placeholder="选择商品来源">
-          <el-option label="淘宝" value="taobao"></el-option>
-          <el-option label="天猫" value="tmall"></el-option>
-        </el-select>
 
-        <!-- 排序 -->
-        <el-select v-model="sortBy" placeholder="选择排序方式" @change="handleSort">
-          <el-option label="综合" value="default"></el-option>
-          <el-option label="销量" value="sales"></el-option>
-          <el-option label="价格" value="price"></el-option>
-        </el-select>
-      </el-aside>
 
       <el-main>
-        <div class="product-list">
-          <el-row gutter="20">
-            <el-col v-for="(product, index) in filteredProducts" :key="index" :span="6">
-              <el-card :body-style="{ padding: '20px' }">
-                <img :src="product.img" class="product-image" />
+        <el-row gutter="20" style="margin-left: 80px; margin-right: 80px;">
+            <el-col v-for="(product, index) in Products" :key="index" :span="4">
+              <router-link :to="`/login`">
+                <img :src="images[index]" class="product-image" style="border-radius: 10px;"/>
                 <div class="product-info">
-                  <p>{{ product.pname }}</p>
-                  <p>数量: {{ product.number }}</p>
-                  <p>价格: ¥{{ product.price }}</p>
-                  <el-button type="primary" size="small" :href="`/productDetail/${product.id}`">查看</el-button>
+                  <p style="overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
+                    <span style="font-size: 18px; color:brown;">{{ product.pname }}</span>
+                    {{ product.desc }}
+                  </p>
+                  <p style="color: crimson;">¥{{ product.price }}</p>
                 </div>
-              </el-card>
+              </router-link>
             </el-col>
-          </el-row>
-        </div>
+        </el-row>
       </el-main>
     </el-container>
   </div>
 </template>
 
-<script>
-import { ref, watchEffect } from 'vue';
+<script setup lang="ts">
+import { ref, onMounted } from 'vue';
 import { ElSelect, ElOption, ElInput, ElButton, ElRow, ElCol, ElCard, ElMessage } from 'element-plus';
 import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
 import { search } from '@/api/product'
-import request from '@/api/axios';
+import { getProductsByClass } from '../../api/product';
 
-export default {
-  components: {
-    ElSelect,
-    ElOption,
-    ElInput,
-    ElButton,
-    ElRow,
-    ElCol,
-    ElCard,
-    ElMessage
-  },
-  setup() {
-    const route = useRoute();
-    const router = useRouter();
-
-    // 从路由参数获取搜索关键词
-    const searchQuery = ref(route.query.productname || '');  // 如果没有查询参数则默认为空字符串
-    const selectedSource = ref('');  // 商品来源
-    const sortBy = ref('default');  // 排序方式
-
-    // 商品列表和过滤后的商品列表
-    const products = ref([]);
-    const filteredProducts = ref([]);
-
-    // 从后端获取商品数据
-    const fetchProducts = async () => {
-      try {
-        const response = await request.get('http://localhost:8080/product/findByProductname', {
-          params: { productname: searchQuery.value }  // 请求带上搜索关键字
-        });
-        // 如果返回的是单个商品，转为数组
-        const productsData = Array.isArray(response.data) ? response.data : [response.data];
-
-        products.value = productsData;  // 将返回的商品数据存入
-
-        console.log('查询到的商品数据:', products.value);
-            products.value.forEach(product => {
-              console.log(`商品名称: ${product.pname}, 价格: ${product.price}, 数量: ${product.number}`);
-            });
-
-        filterProducts();  // 获取商品数据后进行过滤
-
-        // 如果没有查询到商品，弹出提示信息
-        if (products.value.length === 0) {
-              ElMessage({
-              message: '没有查询到该商品',
-              type: 'warning',
-              });
-            }
-      } catch (error) {
-        console.error('获取商品数据失败:', error);
-        ElMessage({
-          message: '查询商品时发生错误，请稍后再试',
-          type: 'error',
-        });
-      }
-    };
-
-    // 过滤商品，根据搜索关键词和筛选条件更新商品列表
-    const filterProducts = () => {
-      filteredProducts.value = products.value.filter(product => {
-        const matchesKeyword = product.pname && product.pname.toLowerCase().includes(searchQuery.value.toLowerCase());
-        const matchesSource = selectedSource.value ? product.pclass === selectedSource.value : true;
-        return matchesKeyword && matchesSource;
-      });
-      handleSort();  // 执行排序
-    };
-
-    // 排序商品列表
-    const handleSort = () => {
-      filteredProducts.value.sort((a, b) => {
-        if (sortBy.value === 'sales') {
-          return b.number - a.number;  // 销量降序
-        }
-        if (sortBy.value === 'price') {
-          return a.price - b.price;  // 价格升序
-        }
-        return 0;  // 默认不排序
-      });
-    };
-
-    // 搜索功能：点击搜索按钮时更新路由并获取商品
-    const searchProducts = () => {
-      if (searchQuery.value.trim()) {
-        router.push({ name: 'productSearch', query: { q: searchQuery.value } });  // 更新路由
-        fetchProducts();  // 调用 fetchProducts 获取商品数据
-      }
-    };
-
-    // 监听路由变化：每次路由参数变化时重新获取数据
-    watchEffect(() => {
-      if (route.query.q) {
-        searchQuery.value = route.query.q;  // 更新搜索关键词
-        fetchProducts();  // 重新获取商品
-      }
-    });
-
-    // 初始化：获取商品数据
-    fetchProducts();
-
-    return { searchQuery, selectedSource, sortBy, filteredProducts, handleSort, searchProducts };
-  }
-};
+const Products = ref([])
+const images = ref([])
+function handleClick(text) {
+  const pclass = text === '全部' ? null : {productClass:text};  // 分类名称为空时，获取全部商品
+  getProductsByClass(pclass).then(res => {
+    console.log(res);
+    Products.value = res.data.products;
+    images.value = res.data.pictures.map(picture => `data:image/jpg;base64,${picture}`);
+  })
+}
+onMounted(() => {
+  handleClick('全部');
+})
 </script>
 
 <style scoped>

@@ -2,12 +2,16 @@
   <div id="app">
     <!-- 顶部导航栏 -->
     <el-header class="header">
+      <el-button type="primary" 
+      class="menu-btn" 
+      style="margin-left: 10px;"
+      @click="$router.push('/homePage')">首页</el-button>
+
       <div class="logo">东南易购</div>
       <el-input
         v-model="searchQuery"
         class="search-bar"
         placeholder="搜索商品"
-        prefix-icon="el-icon-search"
         style="width: 300px; height: 40px;"
         @keyup.enter="search"
       >
@@ -25,36 +29,61 @@
     <el-container>
       <!-- 左侧，商品分类树 -->
       <el-aside width="200px" class="sidebar">
-        <el-tree
-          :data="categories"
-          :props="treeProps"
-          accordion
-          default-expand-all
-        />
+        <div>
+          <el-button
+            v-for="button in buttons"
+            :key="button.text"
+            :type="button.type"
+            @click="handleClick(button.text)"
+            text
+            style="width: 100%; margin-bottom: 10px; margin-left: 0%;"
+          >
+          {{ button.text }}
+          </el-button>
+        </div>
       </el-aside>
 
       <el-main>
         <!-- 轮播图展示 -->
-        <el-carousel :interval="4000" arrow="always" type="card" class="carousel">
-          <el-carousel-item v-for="(item, index) in carouselItems" :key="index">
-            <img :src="item.image" alt="轮播图" />
-          </el-carousel-item>
-        </el-carousel>
+        <el-card>
+          <el-carousel :interval="4000" arrow="always" type="card" class="carousel">
+            <el-carousel-item v-for="(item, index) in carouselItems" :key="index">
+              <img :src="item.link" alt="轮播图" />
+            </el-carousel-item>
+          </el-carousel>
+        </el-card>
 
         <!-- 热门商品展示 -->
         <div class="hot-products">
           <h2>热门商品</h2>
-          <el-row gutter="20">
+            <el-row gutter="20">
             <el-col v-for="(product, index) in hotProducts" :key="index" :span="6">
-              <el-card :body-style="{ padding: '20px' }">
-                <img :src="product.image" class="product-image" />
+              <router-link :to="`/login`">
+                <img :src="images[index]" class="product-image" style="border-radius: 10px;"/>
                 <div class="product-info">
-                  <p>{{ product.name }}</p>
-                  <el-button type="primary" size="small" :href="product.link">查看</el-button>
+                  <p style="overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
+                    <span style="font-size: 18px; color:brown;">{{ product.pname }}</span>
+                    {{ product.desc }}
+                  </p>
+                  <p style="color: crimson;">¥{{ product.price }}</p>
                 </div>
-              </el-card>
+              </router-link>
             </el-col>
-          </el-row>
+        </el-row>
+        <el-row gutter="20">
+            <el-col v-for="(product, index) in hotProducts" :key="index" :span="6">
+              <router-link :to="`/login`">
+                <img :src="images[index]" class="product-image" style="border-radius: 10px;"/>
+                <div class="product-info">
+                  <p style="overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
+                    <span style="font-size: 18px; color:brown;">{{ product.pname }}</span>
+                    {{ product.desc }}
+                  </p>
+                  <p style="color: crimson;">¥{{ product.price }}</p>
+                </div>
+              </router-link>
+            </el-col>
+        </el-row>
         </div>
       </el-main>
 
@@ -64,10 +93,10 @@
         <div class="user-info">
           <el-avatar size="large" src="https://randomuser.me/api/portraits/men/41.jpg"></el-avatar>
           <p class="user-name">用户名</p>
-          <el-button type="text">收藏夹</el-button>
-          <el-button type="text">购物车</el-button>
         </div>
 
+        <el-button type="primary" style="width: 100%; margin-top: 20px;">快速登录</el-button>
+        <el-button text style="margin-top: 10px;">没有账号？去注册</el-button>
         <!-- 侧边栏 -->
         <el-menu class="sidebar-menu" mode="vertical">
           <el-menu-item index="1">消息</el-menu-item>
@@ -79,78 +108,59 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import { ElContainer, ElHeader, ElInput, ElAside, ElMain, ElCarousel, ElCarouselItem, ElTree, ElRow, ElCol, ElCard, ElButton, ElAvatar, ElMenu, ElMenuItem } from 'element-plus';
 import { useRouter } from 'vue-router';  // 引入useRouter钩子
 import productImage1 from '@/assets/images/1.png';
 import productImage2 from '@/assets/images/2.png';
 import productImage3 from '@/assets/images/3.png';
 import productImage4 from '@/assets/images/4.png';
+import { onMounted, ref } from 'vue';
+import { getProductsByClass } from '../../api/product';
+ 
+const searchQuery = ref('')  // 存储搜索关键词
+// 商品分类数据
+const buttons = [
+  { type: '', text: '全部' },
+  { type: '', text: '数码产品' },
+  { type: '', text: '电脑' },
+  { type: '', text: '耳机' },
+  { type: '', text: '家具' },
+  { type: '', text: '厨房用品' },
+  { type: '', text: '床上用品' },
+  { type: '', text: '男装' },
+  { type: '', text: '女装' },
+  { type: '', text: '鞋子' },
+]
+// 轮播图数据
+const carouselItems = ref([
+  { name: 'iPhone 13', image: productImage1, link: 'https://2d.zol-img.com.cn/product/215_800x600/931/ceEZ5pBcvRQJQ.jpg' },
+  { name: 'MacBook Pro 16', image: productImage2, link: 'https://www.apple.com/v/macbook-pro-14-and-16/b/images/overview/hero/hero_intro_endframe__e6khcva4hkeq_large.jpg' },
+  { name: 'AirPods Pro', image: productImage3, link: 'https://tse1-mm.cn.bing.net/th/id/OIP-C.KWivfOMFFd0xyreIWDxvlQHaEK?rs=1&pid=ImgDetMain' },
+  { name: '华为MateBook X Pro', image: productImage4, link: 'https://tse1-mm.cn.bing.net/th/id/OIP-C.mSkTgn_-cZxQKg3oN27trAHaDt?rs=1&pid=ImgDetMain' }
+])
+// 热门商品数据
+const hotProducts = ref([])
+const images = ref([])
+function handleClick(text) {
+  const pclass = text === '全部' ? null : {productClass:text};  // 分类名称为空时，获取全部商品
+  getProductsByClass(pclass).then(res => {
+    console.log(res);
+    hotProducts.value = res.data.products;
+    images.value = res.data.pictures.map(picture => `data:image/jpg;base64,${picture}`);
+  })
+}
+onMounted(() => {
+  handleClick('全部');
+})
 
-
-export default {
-  components: {
-    ElContainer,
-    ElHeader,
-    ElInput,
-    ElAside,
-    ElMain,
-    ElCarousel,
-    ElCarouselItem,
-    ElTree,
-    ElRow,
-    ElCol,
-    ElCard,
-    ElButton,
-    ElAvatar,
-    ElMenu,
-    ElMenuItem
-  },
-  data() {
-    return {
-      searchQuery: '',  // 存储搜索关键词
-      // 商品分类数据
-      categories: [
-        { label: '电子产品', children: [{ label: '手机' }, { label: '电脑' }, { label: '耳机' }] },
-        { label: '家居生活', children: [{ label: '家具' }, { label: '厨房用品' }, { label: '床上用品' }] },
-        { label: '服饰鞋包', children: [{ label: '男装' }, { label: '女装' }, { label: '鞋子' }] },
-      ],
-      // 轮播图数据
-      carouselItems: [
-        { name: 'iPhone 13', image: productImage1, link: 'https://www.apple.com/cn/iphone-13/' },
-        { name: 'MacBook Pro 16', image: productImage2, link: 'https://www.apple.com/cn/macbook-pro-16/' },
-        { name: 'AirPods Pro', image: productImage3, link: 'https://www.apple.com/cn/airpods-pro/' },
-        { name: '华为MateBook X Pro', image: productImage4, link: 'https://www.huawei.com/cn/laptops/matebook-x-pro' }
-      ],
-      // 热门商品数据
-      hotProducts: [
-        { name: 'iPhone 13', image: productImage1, link: 'https://www.apple.com/cn/iphone-13/' },
-        { name: 'MacBook Pro 16', image: productImage2, link: 'https://www.apple.com/cn/macbook-pro-16/' },
-        { name: 'AirPods Pro', image: productImage3, link: 'https://www.apple.com/cn/airpods-pro/' },
-        { name: '华为MateBook X Pro', image: productImage4, link: 'https://www.huawei.com/cn/laptops/matebook-x-pro' }
-      ],
-      // 商品分类树结构
-      treeProps: {
-        children: 'children',
-        label: 'label'
-      }
-    };
-  },
-  watch: {
-      '$route.query.productname'(newQuery) {
-        this.searchQuery = newQuery || '';  // 同步路由查询参数到搜索框
-      }
-    },
-  methods: {
-    search() {
-      const query = this.searchQuery.trim();  // 获取去除空格的搜索关键词
-      if (query) {
-        console.log('keyword:', query);  // 打印出查询参数
-        this.$router.push({ path: '/productSearch', query: { productname: query } });  // 跳转到搜索结果页面，并传递查询参数
-      }
-    }
+function search() {
+  const query = this.searchQuery.trim();  // 获取去除空格的搜索关键词
+  if (query) {
+    console.log('keyword:', query);  // 打印出查询参数
+    this.$router.push({ path: '/productSearch', query: { productname: query } });  // 跳转到搜索结果页面，并传递查询参数
   }
-};
+}
 </script>
 
 <style scoped>
