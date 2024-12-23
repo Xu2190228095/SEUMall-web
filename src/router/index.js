@@ -26,6 +26,11 @@ const router = new createRouter({
         component: () => import('@/views/User/register.vue')
     },
       {
+          path: '/try_test', //佟若祎专门用来测试的页面
+          name: 'try_test',
+          component: () => import('@/views/admin/product/test_productinfo.vue')
+      },
+      {
           path: '/product',
           name: 'Product',
           component: () => import('@/views/admin/product/index.vue'),
