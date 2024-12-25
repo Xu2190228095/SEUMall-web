@@ -164,7 +164,7 @@
 </template>
 
 <script>
-  import {fetchList as fetchMemberLevelList} from '@/api/memberLevel'
+  // import {fetchList as fetchMemberLevelList} from '@/api/memberLevel'
 
   export default {
     name: "ProductSaleDetail",

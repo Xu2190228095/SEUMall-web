@@ -24,3 +24,11 @@ export function fetchProduct(productid) {
     }
   });
 }
+
+export function fetchList(params) {
+    return request({
+        url: '/product/fetchList',
+        method: 'get',
+        params
+    });
+}

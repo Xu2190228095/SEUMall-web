@@ -162,11 +162,11 @@
 </template>
 
 <script>
-  import {fetchList as fetchProductAttrCateList} from '@/api/productAttrCate'
-  import {fetchList as fetchProductAttrList} from '@/api/productAttr'
-  import SingleUpload from '@/components/Upload/singleUpload'
-  import MultiUpload from '@/components/Upload/multiUpload'
-  import Tinymce from '@/components/Tinymce'
+  // import {fetchList as fetchProductAttrCateList} from '@/api/productAttrCate'
+  // import {fetchList as fetchProductAttrList} from '@/api/productAttr'
+  // import SingleUpload from '@/components/Upload/singleUpload'
+  // import MultiUpload from '@/components/Upload/multiUpload'
+  // import Tinymce from '@/components/Tinymce'
 
   export default {
     name: "ProductAttrDetail",
