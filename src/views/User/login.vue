@@ -126,7 +126,6 @@
       const token = ref(null)
       const loginFormRef = ref(null);
       onMounted(() => {
-        console.log(loginFormRef);
       });
       const handleLogin = () => {
         loginFormRef.value.validate(valid => {
