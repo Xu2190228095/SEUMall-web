@@ -1,9 +1,9 @@
 <template>
     <div class="tab-container">
-      <el-tabs v-model="activeTab" :tab-position="tabPosition" class="demo-tabs">
+      <el-tabs v-model="activeTab" :tab-position="tabPosition" class="demo-tabs">     
         <el-tab-pane label="个人资料" name="personalData"></el-tab-pane>
+        <el-tab-pane label="过往订单" name="personalOrder"></el-tab-pane>
         <el-tab-pane label="安全设置" name="securitySettings"></el-tab-pane>
-        <el-tab-pane label="账号绑定信息" name="accountBindingInformation"></el-tab-pane>
         <el-tab-pane label="收货地址管理" name="deliveryAddressManagement"></el-tab-pane>
         <el-tab-pane label="页面个性化" name="pagePersonalization"></el-tab-pane>
       </el-tabs>
@@ -15,7 +15,7 @@
 </template>
   
 <script lang="ts" setup>
-  import { ref, defineAsyncComponent } from 'vue'
+  import { ref, defineAsyncComponent, onMounted } from 'vue'
   import type { TabsInstance } from 'element-plus'
 
   const tabPosition = ref<TabsInstance['tabPosition']>('left')
@@ -24,11 +24,17 @@
   // 使用 defineAsyncComponent 来延迟加载右侧组件
   const rightComponents = {
     personalData: defineAsyncComponent(() => import('./personalData.vue')),
+    personalOrder: defineAsyncComponent(() => import('./userOrder.vue')),
     securitySettings: defineAsyncComponent(() => import('./securitySettings.vue')),
-    accountBindingInformation: defineAsyncComponent(() => import('./accountBindingInformation.vue')),
     deliveryAddressManagement: defineAsyncComponent(() => import('./deliveryAddressManagement.vue')),
     pagePersonalization: defineAsyncComponent(() => import('./pagePersonalization.vue')),
   }
+
+  // 直接在 `<script setup>` 中使用 `onMounted`
+  onMounted(() => {
+    localStorage.setItem("cid", "1");
+  })
+
 </script>
   
 <style>
