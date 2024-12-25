@@ -23,3 +23,11 @@ export function updateOrderStatus(params) {
     data: params
   });
 }
+
+export function getOrdersByUserId(params) {
+  return request({
+    url: '/order/customerOrder',
+    method: 'get',
+    params
+  });
+}
