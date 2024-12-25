@@ -89,6 +89,11 @@ const router = new createRouter({
         component: () => import('@/views/User/goodsDetail.vue')//商品界面
     },
     {
+        path: '/temp',
+        name: 'temp',
+        component: () => import('@/views/User/temp.vue')//商品界面
+    },
+    {
       path: '/userInfo',
       name: 'userInfo',
       component: () => import('@/views/User/userInfo.vue')//个人信息界面

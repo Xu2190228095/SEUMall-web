@@ -2,14 +2,13 @@
   <div id="search-page">
     <!-- 顶部导航栏 -->
         <el-header class="header">
-          <div class="logo">东南易购</div>
+          <router-link class="logo" to="/homePage">东南易购</router-link>
           <el-input
-            v-model="searchQuery"
+            v-model="searchQuery.productName"
             class="search-bar"
             placeholder="搜索商品"
             prefix-icon="el-icon-search"
             style="width: 300px; height: 40px;"
-            @keyup.enter="search"
           >
             <template #append>
               <el-button
@@ -23,176 +22,165 @@
         </el-header>
 
     <el-container>
-      <el-aside width="200px" class="sidebar">
-        <!-- 筛选商品来源 -->
-        <el-select v-model="selectedSource" placeholder="选择商品来源">
-          <el-option label="淘宝" value="taobao"></el-option>
-          <el-option label="天猫" value="tmall"></el-option>
-        </el-select>
-
-        <!-- 排序 -->
-        <el-select v-model="sortBy" placeholder="选择排序方式" @change="handleSort">
-          <el-option label="综合" value="default"></el-option>
-          <el-option label="销量" value="sales"></el-option>
-          <el-option label="价格" value="price"></el-option>
-        </el-select>
-      </el-aside>
-
       <el-main>
-        <div class="product-list">
-          <el-row gutter="20">
-            <el-col v-for="(product, index) in filteredProducts" :key="index" :span="6">
-              <el-card :body-style="{ padding: '20px' }">
-                <img :src="product.img" class="product-image" />
+        <el-header>
+        <el-button type="primary" @click="searchProducts" style="margin-left: 75%;">销量</el-button>
+        <el-select v-model="searchQuery.sortOption" placeholder="价格" style="width: 100px; margin-left: 20px;" @change="searchProducts">
+          <el-option v-for="item in sortOptions"
+                           :key="item.value"
+                           :label="item.label"
+                           :value="item.value">
+                </el-option>
+        </el-select>
+      </el-header>
+        <el-row gutter="20" style="margin-left: 80px; margin-right: 80px;">
+            <el-col v-for="(product, index) in Products" :key="index" :span="6">
+              <router-link :to="{ path: '/productDetail', query: { id: product.pid } }">
+                <img :src="images[index]" class="product-image" style="border-radius: 10px;"/>
                 <div class="product-info">
-                  <p>{{ product.pname }}</p>
-                  <p>数量: {{ product.number }}</p>
-                  <p>价格: ¥{{ product.price }}</p>
-                  <el-button type="primary" size="small" @click="gotoProducts(product)">查看</el-button>
+                  <p style="overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
+                    <span style="font-size: 18px; color:brown;">{{ product.pname }}</span>
+                    {{ product.desc }}
+                  </p>
+                  <p style="color: crimson;">¥{{ product.price }}</p>
                 </div>
-              </el-card>
+              </router-link>
             </el-col>
-          </el-row>
-        </div>
+        </el-row>
       </el-main>
+
+       <!-- 右侧，用户信息与侧边栏 -->
+      <el-aside width="300px" class="right-sidebar">
+        <!-- 用户信息 -->
+        <router-link to="/userInfo">
+        <div class="user-info">
+          <el-avatar size="large" src="https://randomuser.me/api/portraits/men/41.jpg"></el-avatar>
+          <p class="user-name">{{customerInfo.username}}</p>
+        </div>
+        </router-link>
+        <div v-if="!logined">
+        <el-button type="primary" style="width: 100%; margin-top: 20px;" @click=handleLogin>快速登录</el-button>
+        <el-button text style="margin-top: 10px;">没有账号？去注册</el-button>
+        </div>
+        <!-- 侧边栏 -->
+        <el-menu class="sidebar-menu" mode="vertical">
+          <el-menu-item index="1">消息</el-menu-item>
+          <el-menu-item index="2">购物车</el-menu-item>
+          <el-menu-item index="3">客服</el-menu-item>
+        </el-menu>
+      </el-aside>
     </el-container>
   </div>
+  <el-dialog
+      :title="'快速登录'"
+      v-model="dialogVisible"
+      align-center
+      width="30%">
+      <el-form :model="customer"
+               ref="customerForm"
+               size="small">
+        <el-form-item label="帐号：">
+          <el-input v-model="customer.username" ></el-input>
+        </el-form-item>
+        <el-form-item label="密码：">
+          <el-input v-model="customer.password"  type="password"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false" size="small">取 消</el-button>
+        <el-button type="primary" @click="handleDialogConfirm()" size="small">确 定</el-button>
+      </span>
+    </el-dialog>
 </template>
 
-<script>
-import { ref, watchEffect } from 'vue';
-import { ElSelect, ElOption, ElInput, ElButton, ElRow, ElCol, ElCard, ElMessage } from 'element-plus';
-import { useRoute, useRouter } from 'vue-router';
-import axios from 'axios';
-import { search } from '@/api/product'
-import request from '@/api/axios';
-import productImage_chocolate from '@/assets/images/chocolate.jpg';
-import productImage_shoe from '@/assets/images/shoe.jpg';
-import productImage_sweatshirt from '@/assets/images/sweatshirt.jpg';
-import productImage_esteelauder from '@/assets/images/esteelauder.jpg';
-import productImage_pocket from '@/assets/images/pocket.jpg';
+<script setup lang="ts">
+import { ref, onMounted } from 'vue';
+import { ElContainer, ElMain, ElHeader, ElInput, ElButton, ElRow, ElCol, ElCard, ElMessage,ElAside} from 'element-plus';
+import { RouterLink, useRoute, useRouter } from 'vue-router';
+import { searchByProductName,getProductsByClass } from '../../api/product';
+import { auth,login } from '@/api/customer'
+import { setToken } from '@/utils/auth'
 
+const router = useRouter();
 
-export default {
-  components: {
-    ElSelect,
-    ElOption,
-    ElInput,
-    ElButton,
-    ElRow,
-    ElCol,
-    ElCard,
-    ElMessage
-  },
-  setup() {
-    const route = useRoute();
-    const router = useRouter();
-
-    // 从路由参数获取搜索关键词
-    const searchQuery = ref(route.query.productname || '');  // 如果没有查询参数则默认为空字符串
-    const selectedSource = ref('');  // 商品来源
-    const sortBy = ref('default');  // 排序方式
-
-    // 商品列表和过滤后的商品列表
-    const products = ref([]);
-    const filteredProducts = ref([]);
-
-    // 从后端获取商品数据
-    const fetchProducts = async () => {
-      try {
-        const response = await request.get('http://localhost:8080/product/findByProductname', {
-          params: { productname: searchQuery.value }  // 请求带上搜索关键字
-        });
-        // 如果返回的是单个商品，转为数组
-        const productsData = Array.isArray(response.data) ? response.data : [response.data];
-
-        products.value = productsData;  // 将返回的商品数据存入
-
-        console.log('查询到的商品数据:', products.value);
-            products.value.forEach(product => {
-              console.log(`商品名称: ${product.pname}, 价格: ${product.price}, 数量: ${product.number}`);
-            });
-
-        filterProducts();  // 获取商品数据后进行过滤
-
-        // 如果没有查询到商品，弹出提示信息
-        if (products.value.length === 0) {
-              ElMessage({
-              message: '没有查询到该商品',
-              type: 'warning',
-              });
-            }
-      } catch (error) {
-        console.error('获取商品数据失败:', error);
-        ElMessage({
-          message: '查询商品时发生错误，请稍后再试',
-          type: 'error',
-        });
-      }
-    };
-
-    // 过滤商品，根据搜索关键词和筛选条件更新商品列表
-    const filterProducts = () => {
-      filteredProducts.value = products.value.filter(product => {
-        const matchesKeyword = product.pname && product.pname.toLowerCase().includes(searchQuery.value.toLowerCase());
-        const matchesSource = selectedSource.value ? product.pclass === selectedSource.value : true;
-        return matchesKeyword && matchesSource;
-      });
-      handleSort();  // 执行排序
-    };
-
-    // 排序商品列表
-    const handleSort = () => {
-      filteredProducts.value.sort((a, b) => {
-        if (sortBy.value === 'sales') {
-          return b.number - a.number;  // 销量降序
-        }
-        if (sortBy.value === 'price') {
-          return a.price - b.price;  // 价格升序
-        }
-        return 0;  // 默认不排序
-      });
-    };
-
-    // 搜索功能：点击搜索按钮时更新路由并获取商品
-    const searchProducts = () => {
-      if (searchQuery.value.trim()) {
-        router.push({ name: 'productSearch', query: { q: searchQuery.value } });  // 更新路由
-        fetchProducts();  // 调用 fetchProducts 获取商品数据
-      }
-    };
-
-    // 监听路由变化：每次路由参数变化时重新获取数据
-    watchEffect(() => {
-      if (route.query.q) {
-        searchQuery.value = route.query.q;  // 更新搜索关键词
-        fetchProducts();  // 重新获取商品
-      }
-    });
-
-    const gotoProducts = (product) => {
-      // 打印出 product 对象和 product.id
-      console.log('Product:', product);
-      console.log('Product ID:', product ? product.id : 'No ID');
-
-      if (product && product.id) {
-        // 确保 product.id 是有效的
-        router.push({ path: '/productDetail', query: { productid: product.id } });
-      } else {
-        console.error('Invalid product ID:', product);
-        ElMessage.error('商品 ID 无效');
-      }
-    };
-
-
-
-    // 初始化：获取商品数据
-    fetchProducts();
-
-    return { searchQuery, selectedSource, sortBy, filteredProducts, handleSort, searchProducts, gotoProducts };
+const Products = ref([])
+const images = ref([])
+function handleClick(text) {
+  const pclass = text === '全部' ? null : {productClass:text};  // 分类名称为空时，获取全部商品
+  getProductsByClass(pclass).then(res => {
+    console.log(res);
+    Products.value = res.data.products;
+    images.value = res.data.pictures.map(picture => `data:image/jpg;base64,${picture}`);
+  })
+}
+onMounted(() => {
+  searchQuery.value.productName = router.currentRoute.value.query.productname;
+  searchQuery.value.sortOption = 0;
+  searchProducts();
+  if(localStorage.getItem('username')!=null){
+    logined.value = true
+    customerInfo.value.username = localStorage.getItem('username')
+    customerInfo.value.id = localStorage.getItem('cid')
   }
+})
+const searchQuery = ref({})
+function searchProducts() {
+  // if (searchQuery.value === '' || searchQuery.value === undefined || searchQuery.value === null) {
+  //   ElMessage.error('请输入搜索内容');
+  //   return;
+  // }
+  searchByProductName(searchQuery.value).then(res => {
+    console.log(res);
+    Products.value = res.data.products;
+    images.value = res.data.pictures.map(picture => `data:image/jpg;base64,${picture}`);
+  })
+}
 
-};
+const token = ref(null)  // 存储用户token，初始值为null
+const dialogVisible = ref(false);
+function handleLogin() {
+  dialogVisible.value = true;
+}
+const customer = ref({});
+const customerInfo = ref({
+  username: '用户名',
+  id: '？？？',
+})
+const logined = ref(false)
+function handleDialogConfirm() {
+  console.log(customer.value);
+  auth(customer.value).then(res => {
+              if (res.status === 200) {
+                token.value = res.data.jwt
+                setToken(token.value)
+                console.log(token.value)
+              } else {
+                //showError.value = true
+                console.error(res)
+              }
+            }).catch(err => {
+              console.log(err)
+            })
+            login(customer.value).then(res => {
+              if (res.status === 200) {
+                    localStorage.setItem('username', res.data.username)
+                    localStorage.setItem('cid', res.data.id)
+                    logined.value = true
+                    customerInfo.value.username = res.data.username
+                    customerInfo.value.id = res.data.id
+                } else {
+                  console.error(res)
+                }
+            }).catch(err => {
+              console.log(err)
+            })
+  dialogVisible.value = false;
+}
+
+const sortOptions = [
+  { label: '从低到高', value: 0 },
+  { label: '从高到低', value: 1 },
+]
 </script>
 
 <style scoped>

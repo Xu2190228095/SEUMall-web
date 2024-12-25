@@ -1,22 +1,29 @@
 <template>
     <div class="GoodsDetail">
-        <header>
-            <div class="container clear">
-                <span class="title" @click= "$router.push('/homePage')">东南易购</span>
-                <!-- 如果 tokenjudge 为 true，则显示欢迎信息及个人中心 -->
-                <div class="right">
-                    <span class="name">欢迎您，{{ username }}</span>
-                    <span @click="$router.push('/userInfo')">个人中心</span>
-                    <span @click="logout">退出登录</span>
-                </div>
+      <el-header class="header">
+        <el-button type="primary" 
+        class="menu-btn" 
+        style="margin-left: 10px;"
+        @click="$router.push('/homePage')">首页</el-button>
 
-                <!-- 如果没有 token，则显示登录和注册按钮 -->
-                <!-- <div class="right" v-else>
-                    <span @click="$router.push('/emaillogin')">登录</span>
-                    <span @click="$router.push('/signup')">注册</span>
-                </div> -->
-            </div>
-        </header>
+        <div class="logo">东南易购</div>
+        <el-input
+          v-model="searchQuery"
+          class="search-bar"
+          placeholder="搜索商品"
+          style="width: 300px; height: 40px;"
+          @keyup.enter="search"
+        >
+          <template #append>
+            <el-button
+              type="primary"
+              @click="search"
+              style="height: 100%; padding: 0 10px;">
+              搜索
+            </el-button>
+          </template>
+        </el-input>
+      </el-header>
 
       <div class="content">
         <div class="goodsInfo">
@@ -37,24 +44,8 @@
               <h3 class="price">{{ "¥   " + goodsPrice }}</h3>
             </div>
             <div class="infoBox">
-              <span>规格：</span>
-              <ul>
-                <li v-for="(item, index) in specs" :key="index">
-                  <span>{{ item.name }}</span>
-                  <Radio
-                    v-for="(item1, index1) in item.values"
-                    :key="item1"
-                    :initVal="item.values[0]"
-                    :radioName="item.name"
-                    :radioVal="item1"
-                    @input="valueChange(item1, item.name)"
-                  >
-                    <template #tips>
-                      <span class="tips">{{ item1 }}</span>
-                    </template>
-                  </Radio>
-                </li>
-              </ul>
+              <span>类别： </span>
+              <span>{{goodsClass}}</span>
             </div>
             <div class="infoBox">
               <span>数量：</span>
@@ -124,8 +115,8 @@
 <script>
 import { ref, computed, onMounted } from 'vue';
 import axios from 'axios'; // 用于发起 API 请求
+import {useRouter } from 'vue-router';
 import { fetchProduct} from '../../api/product'; // 引入封装的接口
-import numberInput from '../../components/numberInput.vue';
 import NumberInput from '../../components/numberInput.vue';
 
 export default {
@@ -134,10 +125,15 @@ export default {
     NumberInput,
   },
   setup() {
-    const goodsId = 1; // 假设商品ID,应该要从商品搜索界面点击从而传输商品id
+
+    const router = useRouter();
+
+
+    const goodsId = router.currentRoute.value.query.id;; // 假设商品ID,应该要从商品搜索界面点击从而传输商品id
     const goodsName = ref('');
     const goodsDesc = ref('');
     const goodsPrice = ref('');
+    const goodsClass = ref('');
     const goodsImg = ref([]);
     const goodsNum = ref('');
     const specs = ref([]);
@@ -154,6 +150,7 @@ export default {
         goodsName.value = data.pname;
         goodsDesc.value = data.desc;
         goodsPrice.value = data.price;
+        goodsClass.value = data.pclass;
         goodsImg.value = data.img; // 你可以根据实际返回数据结构调整
         goodsNum.value = data.number;
         specs.value = data.specifications || []; // 规格数据
@@ -230,6 +227,7 @@ export default {
       goodsPrice,
       goodsImg,
       goodsNum,
+      goodsClass,
       num: 1,
       specs,
       selectedSpecs,
@@ -245,6 +243,14 @@ export default {
 
 
 <style scoped>
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+  margin-left: 20px;
+  margin-right: 20px;  /* 增加与搜索框的距离 */
+}
+
 .GoodsDetail {
   .content {
     width: 100%;
@@ -613,7 +619,7 @@ export default {
     cursor: not-allowed;
   }
 
-  header {
+  /* header {
     width: 100%;
     background-color: #4877ec;
     height: 50px;
@@ -665,6 +671,20 @@ export default {
         }
       }
     }
+  } */
+
+  .header {
+    background-color: #409EFF;
+    padding: 10px 0;
+    color: white;
+    display: flex;
+    justify-content: center;  /* 让内容水平居中 */
+    align-items: center;      /* 让内容垂直居中 */
+  }
+
+  .search-bar {
+    width: 300px;
+    height: 40px;
   }
 }
 </style>

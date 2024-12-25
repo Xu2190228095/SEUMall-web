@@ -14,6 +14,27 @@ export function search(data) {
     });
 }
 
+export function getProductsByClass(data) {
+  return request({
+        url: '/product/findByProductClass',
+        method: 'get',
+        params: data,
+        headers: {
+            'Content-Type': 'text/plain'
+        },
+    });
+}
+
+export function searchByProductName(data) {
+  return request({
+        url: '/product/searchByProductName',
+        method: 'get',
+        params: data,
+        headers: {
+            'Content-Type': 'text/plain'
+        },
+    });
+}
 // 获取商品信息的接口
 export function fetchProduct(productid) {
   return request({

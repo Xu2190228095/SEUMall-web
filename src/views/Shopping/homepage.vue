@@ -2,12 +2,12 @@
   <div id="app">
     <!-- 顶部导航栏 -->
     <el-header class="header">
-      <div class="logo">东南易购</div>
+      
+      <router-link class="logo" to="/homePage">东南易购</router-link>
       <el-input
         v-model="searchQuery"
         class="search-bar"
         placeholder="搜索商品"
-        prefix-icon="el-icon-search"
         style="width: 300px; height: 40px;"
         @keyup.enter="search"
       >
@@ -25,49 +25,63 @@
     <el-container>
       <!-- 左侧，商品分类树 -->
       <el-aside width="200px" class="sidebar">
-        <el-tree
-          :data="categories"
-          :props="treeProps"
-          accordion
-          default-expand-all
-        />
+        <div>
+          <el-button
+            v-for="button in buttons"
+            :key="button.text"
+            :type="button.type"
+            @click="handleClick(button.text)"
+            text
+            style="width: 100%; margin-bottom: 10px; margin-left: 0%;"
+          >
+          {{ button.text }}
+          </el-button>
+        </div>
       </el-aside>
 
       <el-main>
         <!-- 轮播图展示 -->
-        <el-carousel :interval="4000" arrow="always" type="card" class="carousel">
-          <el-carousel-item v-for="(item, index) in carouselItems" :key="index">
-            <img :src="item.image" alt="轮播图" />
-          </el-carousel-item>
-        </el-carousel>
+        <el-card>
+          <el-carousel :interval="4000" arrow="always" type="card" class="carousel">
+            <el-carousel-item v-for="(item, index) in carouselItems" :key="index">
+              <img :src="item.link" alt="轮播图" />
+            </el-carousel-item>
+          </el-carousel>
+        </el-card>
 
         <!-- 热门商品展示 -->
         <div class="hot-products">
           <h2>热门商品</h2>
-          <el-row gutter="20">
+            <el-row gutter="20">
             <el-col v-for="(product, index) in hotProducts" :key="index" :span="6">
-              <el-card :body-style="{ padding: '20px' }">
-                <img :src="product.image" class="product-image" />
+              <router-link :to="{ path: '/productDetail', query: { id: product.pid } }">
+                <img :src="images[index]" class="product-image" style="border-radius: 10px;"/>
                 <div class="product-info">
-                  <p>{{ product.name }}</p>
-                  <el-button type="primary" size="small" :href="product.link">查看</el-button>
+                  <p style="overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
+                    <span style="font-size: 18px; color:brown;">{{ product.pname }}</span>
+                    {{ product.desc }}
+                  </p>
+                  <p style="color: crimson;">¥{{ product.price }}</p>
                 </div>
-              </el-card>
+              </router-link>
             </el-col>
-          </el-row>
+        </el-row>
         </div>
       </el-main>
 
       <!-- 右侧，用户信息与侧边栏 -->
       <el-aside width="300px" class="right-sidebar">
         <!-- 用户信息 -->
+        <router-link to="/userInfo">
         <div class="user-info">
           <el-avatar size="large" src="https://randomuser.me/api/portraits/men/41.jpg"></el-avatar>
-          <p class="user-name">zhangsan</p>
-          <el-button type="text">收藏夹</el-button>
-          <el-button type="text">购物车</el-button>
+          <p class="user-name">{{customerInfo.username}}</p>
         </div>
-
+        </router-link>
+        <div v-if="!logined">
+        <el-button type="primary" style="width: 100%; margin-top: 20px;" @click=handleLogin>快速登录</el-button>
+        <el-button text style="margin-top: 10px;">没有账号？去注册</el-button>
+        </div>
         <!-- 侧边栏 -->
         <el-menu class="sidebar-menu" mode="vertical">
           <el-menu-item index="1">消息</el-menu-item>
@@ -77,86 +91,131 @@
       </el-aside>
     </el-container>
   </div>
+
+  <el-dialog
+      :title="'快速登录'"
+      v-model="dialogVisible"
+      align-center
+      width="30%">
+      <el-form :model="customer"
+               ref="customerForm"
+               size="small">
+        <el-form-item label="帐号：">
+          <el-input v-model="customer.username" ></el-input>
+        </el-form-item>
+        <el-form-item label="密码：">
+          <el-input v-model="customer.password"  type="password"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false" size="small">取 消</el-button>
+        <el-button type="primary" @click="handleDialogConfirm()" size="small">确 定</el-button>
+      </span>
+    </el-dialog>
 </template>
 
-<script>
+<script setup lang="ts">
 import { ElContainer, ElHeader, ElInput, ElAside, ElMain, ElCarousel, ElCarouselItem, ElTree, ElRow, ElCol, ElCard, ElButton, ElAvatar, ElMenu, ElMenuItem } from 'element-plus';
 import { useRouter } from 'vue-router';  // 引入useRouter钩子
 import productImage1 from '@/assets/images/1.png';
 import productImage2 from '@/assets/images/2.png';
 import productImage3 from '@/assets/images/3.png';
 import productImage4 from '@/assets/images/4.png';
-import productImage_chocolate from '@/assets/images/chocolate.jpg';
-import productImage_shoe from '@/assets/images/shoe.jpg';
-import productImage_sweatshirt from '@/assets/images/sweatshirt.jpg';
-import productImage_esteelauder from '@/assets/images/esteelauder.jpg';
-import productImage_pocket from '@/assets/images/pocket.jpg';
+import { onMounted, ref } from 'vue';
+import { getProductsByClass } from '../../api/product';
+import { auth,login } from '@/api/customer'
+import { setToken } from '@/utils/auth'
 
-
-
-export default {
-  components: {
-    ElContainer,
-    ElHeader,
-    ElInput,
-    ElAside,
-    ElMain,
-    ElCarousel,
-    ElCarouselItem,
-    ElTree,
-    ElRow,
-    ElCol,
-    ElCard,
-    ElButton,
-    ElAvatar,
-    ElMenu,
-    ElMenuItem
-  },
-  data() {
-    return {
-      searchQuery: '',  // 存储搜索关键词
-      // 商品分类数据
-      categories: [
-        { label: '电子产品', children: [{ label: '手机' }, { label: '电脑' }, { label: '耳机' }] },
-        { label: '家居生活', children: [{ label: '家具' }, { label: '厨房用品' }, { label: '床上用品' }] },
-        { label: '服饰鞋包', children: [{ label: '男装' }, { label: '女装' }, { label: '鞋子' }] },
-      ],
-      // 轮播图数据
-      carouselItems: [
-        { name: 'esteelauder', image: productImage_esteelauder, link: 'https://www.apple.com/cn/iphone-13/' },
-        { name: 'DJIpocket', image: productImage_pocket, link: 'https://www.apple.com/cn/macbook-pro-16/' },
-        { name: 'chocolate', image: productImage_chocolate, link: 'https://www.apple.com/cn/airpods-pro/' },
-        { name: 'shoe', image: productImage_shoe, link: 'https://www.huawei.com/cn/laptops/matebook-x-pro' }
-      ],
-      // 热门商品数据
-      hotProducts: [
-        { name: 'iPhone 13', image: productImage1, link: 'https://www.apple.com/cn/iphone-13/' },
-        { name: 'MacBook Pro 16', image: productImage2, link: 'https://www.apple.com/cn/macbook-pro-16/' },
-        { name: 'AirPods Pro', image: productImage3, link: 'https://www.apple.com/cn/airpods-pro/' },
-        { name: '华为MateBook X Pro', image: productImage4, link: 'https://www.huawei.com/cn/laptops/matebook-x-pro' }
-      ],
-      // 商品分类树结构
-      treeProps: {
-        children: 'children',
-        label: 'label'
-      }
-    };
-  },
-  watch: {
-      '$route.query.productname'(newQuery) {
-        this.searchQuery = newQuery || '';  // 同步路由查询参数到搜索框
-      }
-    },
-  methods: {
-    search() {
-      const query = this.searchQuery.trim();  // 获取去除空格的搜索关键词
-      if (query) {
-        console.log('keyword:', query);  // 打印出查询参数
-        this.$router.push({ path: '/productSearch', query: { productname: query } });  // 跳转到搜索结果页面，并传递查询参数
-      }
-    }
+const router = useRouter();
+ 
+const searchQuery = ref('')  // 存储搜索关键词
+// 商品分类数据
+const buttons = [
+  { type: '', text: '全部' },
+  { type: '', text: '手机' },
+  { type: '', text: '电脑' },
+  { type: '', text: '耳机' },
+  { type: '', text: '家具' },
+  { type: '', text: '床上用品' },
+  { type: '', text: '男装' },
+  { type: '', text: '女装' },
+  { type: '', text: '鞋子' },
+]
+// 轮播图数据
+const carouselItems = ref([
+  { name: 'iPhone 13', image: productImage1, link: 'https://2d.zol-img.com.cn/product/215_800x600/931/ceEZ5pBcvRQJQ.jpg' },
+  { name: 'MacBook Pro 16', image: productImage2, link: 'https://www.apple.com/v/macbook-pro-14-and-16/b/images/overview/hero/hero_intro_endframe__e6khcva4hkeq_large.jpg' },
+  { name: 'AirPods Pro', image: productImage3, link: 'https://tse1-mm.cn.bing.net/th/id/OIP-C.KWivfOMFFd0xyreIWDxvlQHaEK?rs=1&pid=ImgDetMain' },
+  { name: '华为MateBook X Pro', image: productImage4, link: 'https://tse1-mm.cn.bing.net/th/id/OIP-C.mSkTgn_-cZxQKg3oN27trAHaDt?rs=1&pid=ImgDetMain' }
+])
+// 热门商品数据
+const hotProducts = ref([])
+const images = ref([])
+function handleClick(text) {
+  const pclass = text === '全部' ? null : {productClass:text};  // 分类名称为空时，获取全部商品
+  getProductsByClass(pclass).then(res => {
+    console.log(res);
+    hotProducts.value = res.data.products;
+    images.value = res.data.pictures.map(picture => `data:image/jpg;base64,${picture}`);
+  })
+}
+onMounted(() => {
+  handleClick('全部');
+  if(localStorage.getItem('username')!=null){
+    logined.value = true
+    customerInfo.value.username = localStorage.getItem('username')
+    customerInfo.value.id = localStorage.getItem('cid')
   }
-};
+})
+
+function search() {
+  const query = searchQuery.value;  // 获取去除空格的搜索关键词
+  if (query) {
+    console.log('keyword:', query);  // 打印出查询参数
+    router.push({ path: '/productSearch', query: { productname: query } });  // 跳转到搜索结果页面，并传递查询参数
+  }
+}
+
+const token = ref(null)  // 存储用户token，初始值为null
+const dialogVisible = ref(false);
+function handleLogin() {
+  dialogVisible.value = true;
+}
+const customer = ref({});
+const customerInfo = ref({
+  username: '用户名',
+  id: '？？？',
+})
+const logined = ref(false)
+function handleDialogConfirm() {
+  console.log(customer.value);
+  auth(customer.value).then(res => {
+              if (res.status === 200) {
+                token.value = res.data.jwt
+                setToken(token.value)
+                console.log(token.value)
+              } else {
+                //showError.value = true
+                console.error(res)
+              }
+            }).catch(err => {
+              console.log(err)
+            })
+            login(customer.value).then(res => {
+              if (res.status === 200) {
+                    localStorage.setItem('username', res.data.username)
+                    localStorage.setItem('cid', res.data.id)
+                    logined.value = true
+                    customerInfo.value.username = res.data.username
+                    customerInfo.value.id = res.data.id
+                } else {
+                  console.error(res)
+                }
+            }).catch(err => {
+              console.log(err)
+            })
+  dialogVisible.value = false;
+}
 </script>
 
 <style scoped>
