@@ -51,7 +51,7 @@
               <span>数量：</span>
               <NumberInput v-model="num" :min="1" :max="Number(goodsNum)" />
             </div>
-            <button class="buyBtn" @click="buy">立即购买</button>
+            <button class="buyBtn" @click="goToBuyPage">立即购买</button>
             <button @click="addToCart">加入购物车</button>
           </div>
         </div>
@@ -89,10 +89,7 @@
                         <p class="time">{{ item.createTime }}</p>
 
                     </div>
-                  <div v-if="item.reply !== null">
-                    <span>商家回复：</span>
-                    <p class="comment">{{ item.reply }}</p>
-                  </div>
+
                 </li>
               </ul>
             </div>
@@ -216,6 +213,20 @@ export default {
       }
     };
 
+    const goToBuyPage = () => {
+      console.log('按钮点击，准备跳转到支付页面');
+      router.push({
+        name: 'pay',  // 路由名称
+        query: {
+          goodsId,  // 商品 ID
+
+          selectedSpecs: JSON.stringify(selectedSpecs.value),  // 选中的规格，转换成字符串
+        }
+      });
+    };
+
+
+
     // 页面加载时获取商品详情和评论
     onMounted(() => {
       fetchGoodsDetail();
@@ -237,6 +248,7 @@ export default {
       handleDeleteComment,
       handleAddToCart,
       handleBuyNow,
+      goToBuyPage,
       productImage1,
       newComment: {
             content: '',
@@ -255,7 +267,7 @@ export default {
                   score: 5,
                   content: '这款产品真的非常好，质量很好，使用起来也很方便！',
                   createTime: '2024-12-01 10:00',
-                  reply: '感谢您的反馈，我们会继续努力！'
+
                 },
                 {
                   username: '顾客2',
@@ -269,21 +281,21 @@ export default {
                   score: 3,
                   content: '使用体验一般，性价比没有预期的高。',
                   createTime: '2024-12-03 09:45',
-                  reply: '感谢您的反馈，我们会改进产品的性价比！'
+
                 },
                 {
                   username: '顾客4',
                   score: 4,
                   content: '总体不错，外观很喜欢，不过使用时感觉稍微有点复杂。',
                   createTime: '2024-12-05 16:20',
-                  reply: '感谢您的评价，我们会优化使用体验。'
+
                 },
                 {
                   username: '顾客5',
                   score: 2,
                   content: '非常失望，跟描述不符，质量差。',
                   createTime: '2024-12-06 18:00',
-                  reply: null
+
                 }
               ]
     };
@@ -311,6 +323,8 @@ export default {
       overflow: hidden;
 
       .item-detail-big-img img {
+        width: 68px;
+        height: 68px;
         width: 100%;
       }
 
