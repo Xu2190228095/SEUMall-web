@@ -101,7 +101,7 @@ const router = new createRouter({
     {
       path: '/pay',
       name: 'pay',
-      component: () => import('@/views/User/pay.vue')//个人信息界面
+      component: () => import('@/views/Shopping/pay.vue')//个人信息界面
     },
     {
        path: '/homePage',     //根路径

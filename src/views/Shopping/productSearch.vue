@@ -35,7 +35,7 @@
       </el-header>
         <el-row gutter="20" style="margin-left: 80px; margin-right: 80px;">
             <el-col v-for="(product, index) in Products" :key="index" :span="6">
-              <router-link :to="{ path: '/productDetail', query: { id: product.pid } }">
+              <router-link :to="{ path: '/productInterface', query: { id: product.pid } }">
                 <img :src="images[index]" class="product-image" style="border-radius: 10px;"/>
                 <div class="product-info">
                   <p style="overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
@@ -99,20 +99,12 @@ import { ElContainer, ElMain, ElHeader, ElInput, ElButton, ElRow, ElCol, ElCard,
 import { RouterLink, useRoute, useRouter } from 'vue-router';
 import { searchByProductName,getProductsByClass } from '../../api/product';
 import { auth,login } from '@/api/customer'
-import { setToken } from '@/utils/auth'
+import { setToken_c } from '@/utils/auth'
 
 const router = useRouter();
 
 const Products = ref([])
 const images = ref([])
-function handleClick(text) {
-  const pclass = text === '全部' ? null : {productClass:text};  // 分类名称为空时，获取全部商品
-  getProductsByClass(pclass).then(res => {
-    console.log(res);
-    Products.value = res.data.products;
-    images.value = res.data.pictures.map(picture => `data:image/jpg;base64,${picture}`);
-  })
-}
 onMounted(() => {
   searchQuery.value.productName = router.currentRoute.value.query.productname;
   searchQuery.value.sortOption = 0;
@@ -152,7 +144,7 @@ function handleDialogConfirm() {
   auth(customer.value).then(res => {
               if (res.status === 200) {
                 token.value = res.data.jwt
-                setToken(token.value)
+                setToken_c(token.value)
                 console.log(token.value)
               } else {
                 //showError.value = true

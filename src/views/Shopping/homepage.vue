@@ -1,26 +1,6 @@
 <template>
   <div id="app">
-    <!-- 顶部导航栏 -->
-    <el-header class="header">
-      
-      <router-link class="logo" to="/homePage">东南易购</router-link>
-      <el-input
-        v-model="searchQuery"
-        class="search-bar"
-        placeholder="搜索商品"
-        style="width: 300px; height: 40px;"
-        @keyup.enter="search"
-      >
-        <template #append>
-          <el-button
-            type="primary"
-            @click="search"
-            style="height: 100%; padding: 0 10px;">
-            搜索
-          </el-button>
-        </template>
-      </el-input>
-    </el-header>
+    <Header/>
 
     <el-container>
       <!-- 左侧，商品分类树 -->
@@ -54,7 +34,7 @@
           <h2>热门商品</h2>
             <el-row gutter="20">
             <el-col v-for="(product, index) in hotProducts" :key="index" :span="6">
-              <router-link :to="{ path: '/productDetail', query: { id: product.pid } }">
+              <router-link :to="{ path: '/productInterface', query: { id: product.pid } }">
                 <img :src="images[index]" class="product-image" style="border-radius: 10px;"/>
                 <div class="product-info">
                   <p style="overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
@@ -82,13 +62,17 @@
         <el-button type="primary" style="width: 100%; margin-top: 20px;" @click=handleLogin>快速登录</el-button>
         <el-button text style="margin-top: 10px;">没有账号？去注册</el-button>
         </div>
-        <!-- 侧边栏 -->
+
         <el-menu class="sidebar-menu" mode="vertical">
-          <el-menu-item index="1">消息</el-menu-item>
+          <el-menu-item index="1"><router-link to="/userInfo">个人信息</router-link></el-menu-item>
           <el-menu-item index="2">购物车</el-menu-item>
           <el-menu-item index="3">客服</el-menu-item>
         </el-menu>
+        
       </el-aside>
+      <!-- <el-footer style="text-align: center; margin-top: 20px;">
+
+      </el-footer> -->
     </el-container>
   </div>
 
@@ -115,8 +99,6 @@
 </template>
 
 <script setup lang="ts">
-import { ElContainer, ElHeader, ElInput, ElAside, ElMain, ElCarousel, ElCarouselItem, ElTree, ElRow, ElCol, ElCard, ElButton, ElAvatar, ElMenu, ElMenuItem } from 'element-plus';
-import { useRouter } from 'vue-router';  // 引入useRouter钩子
 import productImage1 from '@/assets/images/1.png';
 import productImage2 from '@/assets/images/2.png';
 import productImage3 from '@/assets/images/3.png';
@@ -124,11 +106,9 @@ import productImage4 from '@/assets/images/4.png';
 import { onMounted, ref } from 'vue';
 import { getProductsByClass } from '../../api/product';
 import { auth,login } from '@/api/customer'
-import { setToken } from '@/utils/auth'
+import {setToken_c} from '@/utils/auth'
+import Header from '@/components/Header.vue';
 
-const router = useRouter();
- 
-const searchQuery = ref('')  // 存储搜索关键词
 // 商品分类数据
 const buttons = [
   { type: '', text: '全部' },
@@ -168,14 +148,6 @@ onMounted(() => {
   }
 })
 
-function search() {
-  const query = searchQuery.value;  // 获取去除空格的搜索关键词
-  if (query) {
-    console.log('keyword:', query);  // 打印出查询参数
-    router.push({ path: '/productSearch', query: { productname: query } });  // 跳转到搜索结果页面，并传递查询参数
-  }
-}
-
 const token = ref(null)  // 存储用户token，初始值为null
 const dialogVisible = ref(false);
 function handleLogin() {
@@ -192,7 +164,7 @@ function handleDialogConfirm() {
   auth(customer.value).then(res => {
               if (res.status === 200) {
                 token.value = res.data.jwt
-                setToken(token.value)
+                setToken_c(token.value)
                 console.log(token.value)
               } else {
                 //showError.value = true
