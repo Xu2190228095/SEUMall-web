@@ -1,46 +1,66 @@
 <template> 
   <el-card class="form-container" shadow="never">
-    <el-steps :active="active" finish-status="success" align-center>
-      <el-step title="填写商品信息"></el-step>
-<!--      <el-step title="填写商品促销"></el-step>-->
-<!--      <el-step title="填写商品属性"></el-step>-->
-      <el-step title="选择商品关联"></el-step>
-    </el-steps>
-        <product-info-detail
-            v-show="showStatus[0]"
-            v-model="productParam"
-            :is-edit="isEdit"
-            @nextStep="nextStep">
-        </product-info-detail>
-    <!--    <product-sale-detail-->
-    <!--        v-show="showStatus[1]"-->
-    <!--        v-model="productParam"-->
-    <!--        :is-edit="isEdit"-->
-    <!--        @nextStep="nextStep"-->
-    <!--        @prevStep="prevStep">-->
-    <!--    </product-sale-detail>-->
-    <!--    <product-attr-detail-->
-    <!--        v-show="showStatus[2]"-->
-    <!--        v-model="productParam"-->
-    <!--        :is-edit="isEdit"-->
-    <!--        @nextStep="nextStep"-->
-    <!--        @prevStep="prevStep">-->
-    <!--    </product-attr-detail>-->
-    <!--    <product-relation-detail-->
-    <!--        v-show="showStatus[3]"-->
-    <!--        v-model="productParam"-->
-    <!--        :is-edit="isEdit"-->
-    <!--        @prevStep="prevStep"-->
-    <!--        @finishCommit="finishCommit">-->
-    <!--    </product-relation-detail>-->
+    <div class="centered-title-container">
+      <h1>填写商品信息</h1>
+    </div>
+    <div style="margin-top: 50px">
+      <el-form :model="value" :rules="rules" ref="productInfoForm" label-width="120px" class="form-inner-container" size="small">
+        <el-form-item label="商品分类：" prop="productCategoryId">
+          <el-cascader
+              v-model="selectProductCateValue"
+              :options="productCateOptions">
+          </el-cascader>
+        </el-form-item>
+        <el-form-item label="商品名称：" prop="name">
+          <el-input v-model="value.name"></el-input>
+        </el-form-item>
+        <el-form-item label="副标题：" prop="subTitle">
+          <el-input v-model="value.subTitle"></el-input>
+        </el-form-item>
+        <el-form-item label="商品品牌：" prop="brandId">
+          <el-select
+              v-model="value.brandId"
+              @change="handleBrandChange"
+              placeholder="请选择品牌">
+            <el-option
+                v-for="item in brandOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="商品介绍：">
+          <el-input
+              :autoSize="true"
+              v-model="value.description"
+              type="textarea"
+              placeholder="请输入内容"></el-input>
+        </el-form-item>
+        <el-form-item label="商品货号：">
+          <el-input v-model="value.productSn"></el-input>
+        </el-form-item>
+        <el-form-item label="商品售价：">
+          <el-input v-model="value.price"></el-input>
+        </el-form-item>
+        <!--      <el-form-item label="市场价：">-->
+        <!--        <el-input v-model="value.originalPrice"></el-input>-->
+        <!--      </el-form-item>-->
+        <el-form-item label="商品库存：">
+          <el-input v-model="value.stock"></el-input>
+        </el-form-item>
+        <el-form-item label="计量单位：">
+          <el-input v-model="value.unit"></el-input>
+        </el-form-item>
+        <el-form-item style="text-align: center">
+          <el-button type="primary" size="medium" @click="handleNext('productInfoForm')">下一步</el-button>
+        </el-form-item>
+      </el-form>
+    </div>
   </el-card>
+
 </template>
 <script>
-import ProductInfoDetail from './AddProductComponents/Add_productinfo.vue';
-// import ProductSaleDetail from './components/ProductSaleDetail';
-// import ProductAttrDetail from './components/ProductAttrDetail';
-// import ProductRelationDetail from './components/ProductRelationDetail';
-// import {createProduct,getProduct,updateProduct} from '@/api/product';
 
 const defaultProductParam = {
   albumPics: '',
@@ -105,7 +125,6 @@ const defaultProductParam = {
 };
 export default {
   name: 'ProductDetail',
-  components: {ProductInfoDetail},
   props: {
     isEdit: {
       type: Boolean,
@@ -116,7 +135,40 @@ export default {
     return {
       active: 0,
       productParam: Object.assign({}, defaultProductParam),
-      showStatus: [true, false, false, false]
+      showStatus: [true, false, false, false],
+      hasEditCreated:false,
+      //选中商品分类的值
+      selectProductCateValue: [],
+      productCateOptions: [
+        {
+          label: '饮料',
+          value: '饮料'
+        },
+        {
+          label: '手机',
+          value: '手机'
+        },
+        {
+          label: '电脑',
+          value: '电脑'
+        }],
+      brandOptions: [{
+        label: '小米',
+        value: '小米'
+      }],
+      value:Object.assign({}, defaultProductParam),
+      rules: {
+        name: [
+          {required: true, message: '请输入商品名称', trigger: 'blur'},
+          {min: 2, max: 140, message: '长度在 2 到 140 个字符', trigger: 'blur'}
+        ],
+        subTitle: [{required: true, message: '请输入商品副标题', trigger: 'blur'}],
+        productCategoryId: [{required: true, message: '请选择商品分类', trigger: 'blur'}],
+        brandId: [{required: true, message: '请选择商品品牌', trigger: 'blur'}],
+        description: [{required: true, message: '请输入商品介绍', trigger: 'blur'}],
+        requiredProp: [{required: true, message: '该项为必填项', trigger: 'blur'}]
+      }
+
     }
   },
   created(){
@@ -177,6 +229,10 @@ export default {
 }
 </script>
 <style>
+.centered-title-container {
+  text-align: center;
+  margin-top: 50px; /* 可选：增加一些顶部间距 */
+}
 .form-container {
   width: 960px;
 }
