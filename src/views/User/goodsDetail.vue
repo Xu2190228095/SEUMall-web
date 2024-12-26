@@ -1,8 +1,8 @@
 <template>
     <div class="GoodsDetail">
       <el-header class="header">
-        <el-button type="primary" 
-        class="menu-btn" 
+        <el-button type="primary"
+        class="menu-btn"
         style="margin-left: 10px;"
         @click="$router.push('/homePage')">首页</el-button>
 
@@ -30,7 +30,7 @@
                 <!-- 商品图片部分 -->
             <div class="item-detail-left" style="display: inline-block; transform: translate(150px, 0);">
                 <div class="item-detail-big-img">
-                    <img :src="goodsImg" alt="商品图片" />
+                    <img :src="productImage1" alt="商品图片" />
                 </div>
             </div>
           <div class="infoRight" style="display: inline-block">
@@ -55,7 +55,17 @@
             <button @click="addToCart">加入购物车</button>
           </div>
         </div>
-  
+
+        <!-- 写评论模块 -->
+        <div class="writeCommentBox">
+          <textarea v-model="newComment.content" placeholder="写下您的评论..." rows="4" style="width: 100%;"></textarea>
+
+          <!-- 新增评分组件 -->
+          <el-rate v-model="newComment.score" :max="5" show-text text-color="#ff9900" score-template="{value}" />
+
+          <el-button type="primary" @click="submitComment">提交评论</el-button>
+        </div>
+
         <section class="msgBox leftContainer">
           <ul class="tagList">
             <li
@@ -86,8 +96,7 @@
                         <p class="comment">{{ item.content }}</p>
                         <!-- 评论时间 -->
                         <p class="time">{{ item.createTime }}</p>
-                        <!-- 删除评论按钮 -->
-                        <button type="button" class="btn btn-light" @click="deleteComment(item.username, item.id)">删除评论</button>
+
                     </div>
                   <div v-if="item.reply !== null">
                     <span>商家回复：</span>
@@ -118,6 +127,7 @@ import axios from 'axios'; // 用于发起 API 请求
 import {useRouter } from 'vue-router';
 import { fetchProduct} from '../../api/product'; // 引入封装的接口
 import NumberInput from '../../components/numberInput.vue';
+import productImage1 from '@/assets/images/wahahawater.jpg'
 
 export default {
   name: 'GoodsDetail',
@@ -235,12 +245,61 @@ export default {
       rate,
       handleDeleteComment,
       handleAddToCart,
-      handleBuyNow
+      handleBuyNow,
+      productImage1,
+      newComment: {
+            content: '',
+            score: 5,
+          },
+      curIndex: 0,
+          rate: 4.5,
+          pageData: {
+            total: 5,
+            limit: 3,
+            page: 1
+          },
+          commentList: [
+                {
+                  username: '顾客1',
+                  score: 5,
+                  content: '这款产品真的非常好，质量很好，使用起来也很方便！',
+                  createTime: '2024-12-01 10:00',
+                  reply: '感谢您的反馈，我们会继续努力！'
+                },
+                {
+                  username: '顾客2',
+                  score: 4,
+                  content: '产品质量不错，但送货速度有点慢，整体还是满意的。',
+                  createTime: '2024-12-02 14:30',
+                  reply: null
+                },
+                {
+                  username: '顾客3',
+                  score: 3,
+                  content: '使用体验一般，性价比没有预期的高。',
+                  createTime: '2024-12-03 09:45',
+                  reply: '感谢您的反馈，我们会改进产品的性价比！'
+                },
+                {
+                  username: '顾客4',
+                  score: 4,
+                  content: '总体不错，外观很喜欢，不过使用时感觉稍微有点复杂。',
+                  createTime: '2024-12-05 16:20',
+                  reply: '感谢您的评价，我们会优化使用体验。'
+                },
+                {
+                  username: '顾客5',
+                  score: 2,
+                  content: '非常失望，跟描述不符，质量差。',
+                  createTime: '2024-12-06 18:00',
+                  reply: null
+                }
+              ]
     };
+
   }
 };
 </script>
-
 
 <style scoped>
 
@@ -686,5 +745,46 @@ export default {
     width: 300px;
     height: 40px;
   }
+}
+.writeCommentBox {
+  margin-bottom: 30px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border: 1px solid #b3cde0;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+}
+
+.writeCommentBox textarea {
+  width: 100%;
+  height: 100px;
+  padding: 10px;
+  border: 1px solid #b3cde0;
+  border-radius: 5px;
+  font-size: 14px;
+  color: #333;
+  resize: none;
+  transition: border-color 0.3s ease;
+}
+
+.writeCommentBox textarea:focus {
+  border-color: #005b96;
+}
+
+.writeCommentBox button {
+  align-self: flex-end;
+  background-color: #007acc;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.writeCommentBox button:hover {
+  background-color: #005b96;
 }
 </style>
