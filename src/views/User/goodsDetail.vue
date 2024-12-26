@@ -50,7 +50,9 @@
             <div class="infoBox">
               <span>数量：</span>
               <NumberInput v-model="num" :min="1" :max="Number(goodsNum)" />
+              <span>库存：{{ goodsNum }}</span>
             </div>
+
             <button class="buyBtn" @click="goToBuyPage">立即购买</button>
             <button @click="addToCart">加入购物车</button>
           </div>
@@ -58,53 +60,62 @@
 
 
         <section class="msgBox leftContainer">
-          <ul class="tagList">
-            <li
-              :class="{ selected: curIndex === index }"
-              v-for="(item, index) in tagList"
-              :key="'tag' + index"
-              @click="changeIndex(index)"
-            >
-              {{ item }}
-            </li>
-          </ul>
-          <div class="commentBody" v-if="curIndex === 0">
-            <div v-if="pageData.total > 0" class="rateBox">
-              <span>平均得分</span>
-              <span class="rate">{{ rate }}</span>
-            </div>
-            <div v-if="commentList.length !== 0">
-              <ul class="commentList">
-                <li v-for="(item, index) in commentList" :key="'comment' + index">
+            <ul class="tagList">
+              <li
+                :class="{ selected: curIndex === index }"
+                v-for="(item, index) in tagList"
+                :key="'tag' + index"
+                @click="changeIndex(index)"
+              >
+                {{ item }}
+              </li>
+            </ul>
+
+            <div class="commentBody" v-if="curIndex === 0">
+              <div v-if="total > 0" class="rateBox">
+                <span>平均得分</span>
+                <span class="commentAverageScore" style="margin-right: 20px;">{{ commentAverageScore }}</span> <!-- 设置右边距 -->
+                <span class="totalCommentsCount">共 {{ total }} 条评论</span>
+              </div>
+
+              <div v-if="commentList.length !== 0">
+                <ul class="commentList">
+                  <li v-for="(item, index) in commentList" :key="'comment' + index">
                     <div class="userInfo">
-                        <!-- 只显示用户名，不显示头像 -->
-                        <span>{{ item.username }}</span>
+                      <span>用户{{ item.cid }}</span> <!-- 这里暂时用 cid 代替用户名 -->
                     </div>
                     <div class="commentInfo">
-                        <!-- 评分 -->
-                        <el-rate v-model="item.score" disabled show-score text-color="#ff9900" score-template="{value}" />
-                        <!-- 评论内容 -->
-                        <p class="comment">{{ item.content }}</p>
-                        <!-- 评论时间 -->
-                        <p class="time">{{ item.createTime }}</p>
-
+                      <!-- 评分 -->
+                      <el-rate
+                        v-model="item.score"
+                        disabled
+                        show-score
+                        text-color="#ff9900"
+                        score-template="{value}"
+                      />
+                      <!-- 评论内容 -->
+                      <p class="comment">{{ item.comment }}</p> <!-- 这里是评论内容 -->
+                      <!-- 评论时间（占位，后端没有时间字段的话可以跳过）-->
+                      <p class="time">2024-12-26 12:00</p> <!-- 这里可以加入评论时间 -->
                     </div>
+                  </li>
+                </ul>
+              </div>
 
-                </li>
-              </ul>
+              <div class="noComment" v-else>暂时还没有评论~</div>
+
+              <el-pagination
+                background
+                layout="prev, pager, next"
+                @current-change="handlePageChange"
+                :page-size="5"
+                :current-page.sync="page"
+                :total="total"
+                v-if="total !== 0"
+              />
+
             </div>
-            <div class="noComment" v-else>暂时还没有评论~</div>
-            <el-pagination
-              background
-              layout="prev, pager, next"
-              @current-change="handlePageChange"
-              :page-size="pageData.limit"
-              :current-page.sync="pageData.page"
-              :total="pageData.total"
-              v-if="pageData.total !== 0"
-            />
-          </div>
-        </section>
+          </section>
       </div>
     </div>
   </template>
@@ -114,6 +125,7 @@ import { ref, computed, onMounted } from 'vue';
 import axios from 'axios'; // 用于发起 API 请求
 import {useRouter } from 'vue-router';
 import { fetchProduct} from '../../api/product'; // 引入封装的接口
+import { findByPid} from '../../api/comments'; // 引入封装的接口
 import NumberInput from '../../components/numberInput.vue';
 import productImage1 from '@/assets/images/wahahawater.jpg'
 
@@ -126,7 +138,7 @@ export default {
 
     const router = useRouter();
 
-
+    const num=ref(1);
     const goodsId = router.currentRoute.value.query.id;; // 假设商品ID,应该要从商品搜索界面点击从而传输商品id
     const goodsName = ref('');
     const goodsDesc = ref('');
@@ -136,8 +148,14 @@ export default {
     const goodsNum = ref('');
     const specs = ref([]);
     const selectedSpecs = ref({});
+    const commentAverageScore=ref('');
+    const commentScoreList=ref([]);
+    const commentContentList=ref([]);
     const commentList = ref([]);
     const rate = ref(0);
+    const total = ref(0);  // 总评论数
+    const limit = ref(5);  // 每页显示的评论数
+    const page = ref(1);    // 当前页码
 
     // 获取商品详情
     const fetchGoodsDetail = async () => {
@@ -153,6 +171,7 @@ export default {
         goodsNum.value = data.number;
         specs.value = data.specifications || []; // 规格数据
         rate.value = data.averageRating || 0;
+        console.log('number:', goodsNum.value);
 
         // 初始化选中的规格
         specs.value.forEach(spec => {
@@ -166,10 +185,17 @@ export default {
     // 获取评论列表
     const fetchComments = async () => {
       try {
-        const response = await getComments(goodsId, 1, 10); // 获取第一页的评论，每页10条
+        const response = await findByPid(goodsId); // 获取第一页的评论，每页10条
         const data = response.data;
 
-        commentList.value = data.comments;
+        commentAverageScore.value = data.reduce((sum, item) => sum + item.score, 0) / data.length;  // 计算评论的平均分
+        commentList.value = data;  // 直接将返回的评论数据赋值给 commentList
+        total.value=data.length;
+
+        console.log('Fetched comments:', data);  // 打印整个响应数据
+        console.log('Comments array:', data.comment);  // 打印评论数据
+        console.log('page total:',total);
+
       } catch (error) {
         console.error('Failed to fetch comments:', error);
       }
@@ -219,8 +245,8 @@ export default {
         name: 'pay',  // 路由名称
         query: {
           goodsId,  // 商品 ID
-
-          selectedSpecs: JSON.stringify(selectedSpecs.value),  // 选中的规格，转换成字符串
+          quantity:num.value,
+          //selectedSpecs: JSON.stringify(selectedSpecs.value),  // 选中的规格，转换成字符串
         }
       });
     };
@@ -234,6 +260,10 @@ export default {
     });
 
     return {
+      num,
+      total,
+      limit,
+      page,
       goodsName,
       goodsDesc,
       goodsPrice,
@@ -250,54 +280,15 @@ export default {
       handleBuyNow,
       goToBuyPage,
       productImage1,
+      commentAverageScore,
+      commentScoreList,
+      commentContentList,
       newComment: {
             content: '',
             score: 5,
           },
       curIndex: 0,
-          rate: 4.5,
-          pageData: {
-            total: 15,
-            limit: 5,
-            page: 1
-          },
-          commentList: [
-                {
-                  username: '顾客1',
-                  score: 5,
-                  content: '这款产品真的非常好，质量很好，使用起来也很方便！',
-                  createTime: '2024-12-01 10:00',
-
-                },
-                {
-                  username: '顾客2',
-                  score: 4,
-                  content: '产品质量不错，但送货速度有点慢，整体还是满意的。',
-                  createTime: '2024-12-02 14:30',
-                  reply: null
-                },
-                {
-                  username: '顾客3',
-                  score: 3,
-                  content: '使用体验一般，性价比没有预期的高。',
-                  createTime: '2024-12-03 09:45',
-
-                },
-                {
-                  username: '顾客4',
-                  score: 4,
-                  content: '总体不错，外观很喜欢，不过使用时感觉稍微有点复杂。',
-                  createTime: '2024-12-05 16:20',
-
-                },
-                {
-                  username: '顾客5',
-                  score: 2,
-                  content: '非常失望，跟描述不符，质量差。',
-                  createTime: '2024-12-06 18:00',
-
-                }
-              ]
+      commentList
     };
 
   }
