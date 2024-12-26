@@ -30,7 +30,7 @@
                 <!-- 商品图片部分 -->
             <div class="item-detail-left" style="display: inline-block; transform: translate(150px, 0);">
                 <div class="item-detail-big-img">
-                    <img :src="productImage1" alt="商品图片" />
+                    <img :src= "productImage1" alt="商品图片" />
                 </div>
             </div>
           <div class="infoRight" style="display: inline-block">
@@ -49,7 +49,9 @@
             </div>
             <div class="infoBox">
               <span>数量：</span>
-              <NumberInput v-model="num" :min="1" :max="Number(goodsNum)" />
+              <NumberInput v-model="num" :min="1" :max="goodsNum" />
+            </div>
+            <div class="infobox">
               <span>库存：{{ goodsNum }}</span>
             </div>
 
@@ -72,10 +74,10 @@
             </ul>
 
             <div class="commentBody" v-if="curIndex === 0">
-              <div v-if="total > 0" class="rateBox">
+              <div v-if="totalComment > 0" class="rateBox">
                 <span>平均得分</span>
                 <span class="commentAverageScore" style="margin-right: 20px;">{{ commentAverageScore }}</span> <!-- 设置右边距 -->
-                <span class="totalCommentsCount">共 {{ total }} 条评论</span>
+                <span class="totalCommentsCount">共 {{ totalComment }} 条评论</span>
               </div>
 
               <div v-if="commentList.length !== 0">
@@ -108,10 +110,10 @@
                 background
                 layout="prev, pager, next"
                 @current-change="handlePageChange"
-                :page-size="5"
+                :page-size= "limit"
                 :current-page.sync="page"
-                :total="total"
-                v-if="total !== 0"
+                :total="totalComment"
+                v-if="totalComment !== 0"
               />
 
             </div>
@@ -146,6 +148,7 @@ export default {
     const goodsClass = ref('');
     const goodsImg = ref([]);
     const goodsNum = ref('');
+    const goodsPic = ref( );
     const specs = ref([]);
     const selectedSpecs = ref({});
     const commentAverageScore=ref('');
@@ -153,7 +156,7 @@ export default {
     const commentContentList=ref([]);
     const commentList = ref([]);
     const rate = ref(0);
-    const total = ref(0);  // 总评论数
+    const totalComment = ref(0);  // 总评论数
     const limit = ref(5);  // 每页显示的评论数
     const page = ref(1);    // 当前页码
 
@@ -161,8 +164,9 @@ export default {
     const fetchGoodsDetail = async () => {
       try {
         const response = await fetchProduct(goodsId);
-        const data = response.data;
-
+        const data = response.data.product;
+        console.log("data:",data);
+        goodsPic.value=response.data.picture;
         goodsName.value = data.pname;
         goodsDesc.value = data.desc;
         goodsPrice.value = data.price;
@@ -190,11 +194,11 @@ export default {
 
         commentAverageScore.value = data.reduce((sum, item) => sum + item.score, 0) / data.length;  // 计算评论的平均分
         commentList.value = data;  // 直接将返回的评论数据赋值给 commentList
-        total.value=data.length;
+        totalComment.value=data.length;
 
         console.log('Fetched comments:', data);  // 打印整个响应数据
         console.log('Comments array:', data.comment);  // 打印评论数据
-        console.log('page total:',total);
+        console.log('page total:',totalComment);
 
       } catch (error) {
         console.error('Failed to fetch comments:', error);
@@ -241,6 +245,7 @@ export default {
 
     const goToBuyPage = () => {
       console.log('按钮点击，准备跳转到支付页面');
+      console.log('购买数量',num.value);
       router.push({
         name: 'pay',  // 路由名称
         query: {
@@ -251,7 +256,20 @@ export default {
       });
     };
 
+    // 当页码改变时，处理分页逻辑
+    const handlePageChange = (newPage) => {
+      console.log('当前页码:', newPage);
+      page.value = newPage;
 
+      // 在这里执行分页请求，例如更新展示的数据
+      fetchData(newPage, pageSize);
+    };
+
+    const fetchData = (currentPage, pageSize) => {
+      // 在这里根据分页参数请求数据并更新组件状态
+      console.log('请求数据: ', currentPage, pageSize);
+      // 模拟数据请求，可以根据实际需求进行修改
+    };
 
     // 页面加载时获取商品详情和评论
     onMounted(() => {
@@ -261,7 +279,7 @@ export default {
 
     return {
       num,
-      total,
+      totalComment,
       limit,
       page,
       goodsName,
@@ -270,7 +288,6 @@ export default {
       goodsImg,
       goodsNum,
       goodsClass,
-      num: 1,
       specs,
       selectedSpecs,
       commentList,
@@ -314,6 +331,9 @@ export default {
       overflow: hidden;
 
       .item-detail-big-img img {
+        height: auto;
+        max-width: 500px;  /* 控制最大宽度 */
+        object-fit: contain;  /* 保持图片比例 */
         width: 100%;
       }
 
@@ -322,18 +342,6 @@ export default {
         display: flex;
       }
 
-      .item-detail-img-small {
-        width: 68px;
-        height: 68px;
-        box-shadow: 0px 0px 8px rgba(0, 102, 204, 0.4);
-        cursor: pointer;
-        margin-left: 5px;
-      }
-
-      .item-detail-img-small img {
-        height: 100%;
-        width: 100%;
-      }
 
       .item-detail-left {
         width: 350px;
@@ -341,8 +349,8 @@ export default {
       }
 
       .item-detail-big-img {
-        height: 350px;
-        width: 220px;
+        height: autopx;
+        width: 500px;
         box-shadow: 0px 0px 8px rgba(0, 102, 204, 0.4);
         cursor: pointer;
       }
@@ -464,7 +472,7 @@ export default {
             margin-right: 10px;
           }
 
-          .rate {
+          .commentAverageScore {
             color: #ff5722;
             font-weight: 600;
             font-size: 30px;
@@ -740,45 +748,5 @@ export default {
     height: 40px;
   }
 }
-.writeCommentBox {
-  margin-bottom: 30px;
-  padding: 20px;
-  background-color: #f9f9f9;
-  border: 1px solid #b3cde0;
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-}
 
-.writeCommentBox textarea {
-  width: 100%;
-  height: 100px;
-  padding: 10px;
-  border: 1px solid #b3cde0;
-  border-radius: 5px;
-  font-size: 14px;
-  color: #333;
-  resize: none;
-  transition: border-color 0.3s ease;
-}
-
-.writeCommentBox textarea:focus {
-  border-color: #005b96;
-}
-
-.writeCommentBox button {
-  align-self: flex-end;
-  background-color: #007acc;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  font-size: 16px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.writeCommentBox button:hover {
-  background-color: #005b96;
-}
 </style>
