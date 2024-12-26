@@ -1,4 +1,4 @@
-import request from './axios';
+import request from './axios_c';
 
 export function getAddressesByCid(cid) {
     return request({

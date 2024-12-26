@@ -135,6 +135,7 @@
             auth(loginForm.value).then(res => {
               if (res.status === 200) {
                 token.value = res.data.jwt
+                setToken(token.value)
               } else {
                 //showError.value = true
                 console.error(res)
@@ -145,7 +146,6 @@
             login(loginForm.value).then(res => {
               if (res.status === 200) {
                   if(res.data != -1){
-                    setToken(token.value)
                     if(loginForm.value.character === "ROLE_user"){
                       router.push({ path: '/admin/order_info' })
                     }
