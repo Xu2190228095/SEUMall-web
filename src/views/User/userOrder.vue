@@ -93,6 +93,7 @@ export default {
 
     // 订单数据
     const orders = ref([]);
+    const images = ref([]); // 商品图片
     const listQuery = ref({
       pageNum: 1,
       pageSize: 10,
@@ -109,7 +110,8 @@ export default {
     function getList() {
       getOrdersByUserId(listQuery.value)
         .then((response) => {
-          orders.value = response.data;
+          orders.value = response.data.orders;
+          images.value = response.data.pictures;
         })
         .catch((error) => {
           console.error(error);
