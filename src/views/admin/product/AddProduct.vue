@@ -2,9 +2,9 @@
   <el-card class="form-container" shadow="never">
     <el-steps :active="active" finish-status="success" align-center>
       <el-step title="填写商品信息"></el-step>
-<!--      <el-step title="填写商品促销"></el-step>-->
+      <el-step title="填写商品促销"></el-step>
 <!--      <el-step title="填写商品属性"></el-step>-->
-      <el-step title="选择商品关联"></el-step>
+<!--      <el-step title="选择商品关联"></el-step>-->
     </el-steps>
         <product-info-detail
             v-show="showStatus[0]"
@@ -12,13 +12,13 @@
             :is-edit="isEdit"
             @nextStep="nextStep">
         </product-info-detail>
-    <!--    <product-sale-detail-->
-    <!--        v-show="showStatus[1]"-->
-    <!--        v-model="productParam"-->
-    <!--        :is-edit="isEdit"-->
-    <!--        @nextStep="nextStep"-->
-    <!--        @prevStep="prevStep">-->
-    <!--    </product-sale-detail>-->
+        <product-sale-detail
+            v-show="showStatus[1]"
+            v-model="productParam"
+            :is-edit="isEdit"
+            @nextStep="nextStep"
+            @prevStep="prevStep">
+        </product-sale-detail>
     <!--    <product-attr-detail-->
     <!--        v-show="showStatus[2]"-->
     <!--        v-model="productParam"-->
@@ -37,6 +37,7 @@
 </template>
 <script>
 import ProductInfoDetail from './AddProductComponents/Add_productinfo.vue';
+import ProductSaleDetail from './AddProductComponents/Sale_productinfo.vue';
 // import ProductSaleDetail from './components/ProductSaleDetail';
 // import ProductAttrDetail from './components/ProductAttrDetail';
 // import ProductRelationDetail from './components/ProductRelationDetail';
@@ -105,7 +106,7 @@ const defaultProductParam = {
 };
 export default {
   name: 'ProductDetail',
-  components: {ProductInfoDetail},
+  components: {ProductInfoDetail,ProductSaleDetail},
   props: {
     isEdit: {
       type: Boolean,

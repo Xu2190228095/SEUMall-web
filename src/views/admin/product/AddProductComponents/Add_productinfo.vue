@@ -48,13 +48,6 @@
       <el-form-item label="计量单位：">
         <el-input v-model="value.unit"></el-input>
       </el-form-item>
-<!--      <el-form-item label="商品重量：">-->
-<!--        <el-input v-model="value.weight" style="width: 300px"></el-input>-->
-<!--        <span style="margin-left: 20px">克</span>-->
-<!--      </el-form-item>-->
-<!--      <el-form-item label="排序">-->
-<!--        <el-input v-model="value.sort"></el-input>-->
-<!--      </el-form-item>-->
       <el-form-item style="text-align: center">
         <el-button type="primary" size="medium" @click="handleNext('productInfoForm')">下一步</el-button>
       </el-form-item>
@@ -143,8 +136,23 @@ export default {
       hasEditCreated:false,
       //选中商品分类的值
       selectProductCateValue: [],
-      productCateOptions: [],
-      brandOptions: [],
+      productCateOptions: [
+        {
+          label: '饮料',
+          value: '饮料'
+        },
+        {
+          label: '手机',
+          value: '手机'
+        },
+        {
+          label: '电脑',
+          value: '电脑'
+        }],
+      brandOptions: [{
+        label: '小米',
+        value: '小米'
+      }],
       value:Object.assign({}, defaultProductParam),
       rules: {
         name: [
@@ -159,103 +167,23 @@ export default {
       }
     };
   },
-  // created() {
-  //   this.getProductCateList();
-  //   this.getBrandList();
-  // },
-  // computed:{
-  //   //商品的编号
-  //   productId(){
-  //     return this.value.id;
-  //   }
-  // },
-  // watch: {
-  //   productId:function(newValue){
-  //     if(!this.isEdit)return;
-  //     if(this.hasEditCreated)return;
-  //     if(newValue===undefined||newValue==null||newValue===0)return;
-  //     this.handleEditCreated();
-  //   },
-  //   selectProductCateValue: function (newValue) {
-  //     if (newValue != null && newValue.length === 2) {
-  //       this.value.productCategoryId = newValue[1];
-  //       this.value.productCategoryName= this.getCateNameById(this.value.productCategoryId);
-  //     } else {
-  //       this.value.productCategoryId = null;
-  //       this.value.productCategoryName=null;
-  //     }
-  //   }
-  // },
-  // methods: {
-  //   //处理编辑逻辑
-  //   handleEditCreated(){
-  //     if(this.value.productCategoryId!=null){
-  //       this.selectProductCateValue.push(this.value.cateParentId);
-  //       this.selectProductCateValue.push(this.value.productCategoryId);
-  //     }
-  //     this.hasEditCreated=true;
-  //   },
-  //   getProductCateList() {
-  //     fetchListWithChildren().then(response => {
-  //       let list = response.data;
-  //       this.productCateOptions = [];
-  //       for (let i = 0; i < list.length; i++) {
-  //         let children = [];
-  //         if (list[i].children != null && list[i].children.length > 0) {
-  //           for (let j = 0; j < list[i].children.length; j++) {
-  //             children.push({label: list[i].children[j].name, value: list[i].children[j].id});
-  //           }
-  //         }
-  //         this.productCateOptions.push({label: list[i].name, value: list[i].id, children: children});
-  //       }
-  //     });
-  //   },
-  //   getBrandList() {
-  //     fetchBrandList({pageNum: 1, pageSize: 100}).then(response => {
-  //       this.brandOptions = [];
-  //       let brandList = response.data.list;
-  //       for (let i = 0; i < brandList.length; i++) {
-  //         this.brandOptions.push({label: brandList[i].name, value: brandList[i].id});
-  //       }
-  //     });
-  //   },
-  //   getCateNameById(id){
-  //     let name=null;
-  //     for(let i=0;i<this.productCateOptions.length;i++){
-  //       for(let j=0;j<this.productCateOptions[i].children.length;j++){
-  //         if(this.productCateOptions[i].children[j].value===id){
-  //           name=this.productCateOptions[i].children[j].label;
-  //           return name;
-  //         }
-  //       }
-  //     }
-  //     return name;
-  //   },
-  //   handleNext(formName){
-  //     this.$refs[formName].validate((valid) => {
-  //       if (valid) {
-  //         this.$emit('nextStep');
-  //       } else {
-  //         this.$message({
-  //           message: '验证失败',
-  //           type: 'error',
-  //           duration:1000
-  //         });
-  //         return false;
-  //       }
-  //     });
-  //   },
-  //   handleBrandChange(val) {
-  //     let brandName = '';
-  //     for (let i = 0; i < this.brandOptions.length; i++) {
-  //       if (this.brandOptions[i].value === val) {
-  //         brandName = this.brandOptions[i].label;
-  //         break;
-  //       }
-  //     }
-  //     this.value.brandName = brandName;
-  //   }
-  // }
+  methods: {
+    handleNext(formName){
+      this.$emit('nextStep');
+      // this.$refs[formName].validate((valid) => {
+      //   if (valid) {
+      //     this.$emit('nextStep');
+      //   } else {
+      //     this.$message({
+      //       message: '验证失败',
+      //       type: 'error',
+      //       duration:1000
+      //     });
+      //     return false;
+      //   }
+      // });
+    }}
+
 }
 </script>
 

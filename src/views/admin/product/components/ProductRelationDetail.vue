@@ -39,6 +39,67 @@
   // import {fetchListAll as fetchSubjectList} from '@/api/subject'
   // import {fetchList as fetchPrefrenceAreaList} from '@/api/prefrenceArea'
 
+  const defaultProductParam = {
+    albumPics: '',
+    brandId: null,
+    brandName: '',
+    deleteStatus: 0,
+    description: '',
+    detailDesc: '',
+    detailHtml: '',
+    detailMobileHtml: '',
+    detailTitle: '',
+    feightTemplateId: 0,
+    flashPromotionCount: 0,
+    flashPromotionId: 0,
+    flashPromotionPrice: 0,
+    flashPromotionSort: 0,
+    giftPoint: 0,
+    giftGrowth: 0,
+    keywords: '',
+    lowStock: 0,
+    name: '',
+    newStatus: 0,
+    note: '',
+    originalPrice: 0,
+    pic: '',
+    //会员价格{memberLevelId: 0,memberPrice: 0,memberLevelName: null}
+    memberPriceList: [],
+    //商品满减
+    productFullReductionList: [{fullPrice: 0, reducePrice: 0}],
+    //商品阶梯价格
+    productLadderList: [{count: 0,discount: 0,price: 0}],
+    previewStatus: 0,
+    price: 0,
+    productAttributeCategoryId: null,
+    //商品属性相关{productAttributeId: 0, value: ''}
+    productAttributeValueList: [],
+    //商品sku库存信息{lowStock: 0, pic: '', price: 0, sale: 0, skuCode: '', spData: '', stock: 0}
+    skuStockList: [],
+    //商品相关专题{subjectId: 0}
+    subjectProductRelationList: [],
+    //商品相关优选{prefrenceAreaId: 0}
+    prefrenceAreaProductRelationList: [],
+    productCategoryId: null,
+    productCategoryName: '',
+    productSn: '',
+    promotionEndTime: '',
+    promotionPerLimit: 0,
+    promotionPrice: null,
+    promotionStartTime: '',
+    promotionType: 0,
+    publishStatus: 0,
+    recommandStatus: 0,
+    sale: 0,
+    serviceIds: '',
+    sort: 0,
+    stock: 0,
+    subTitle: '',
+    unit: '',
+    usePointLimit: 0,
+    verifyStatus: 0,
+    weight: 0
+  };
   export default {
     name: "ProductRelationDetail",
     props: {
@@ -57,87 +118,17 @@
         //所有专题列表
         prefrenceAreaList: [],
         //专题左右标题
-        prefrenceAreaTitles: ['待选择', '已选择']
+        prefrenceAreaTitles: ['待选择', '已选择'],
+
+        value:Object.assign({}, defaultProductParam),
       };
     },
     created() {
       this.getSubjectList();
       this.getPrefrenceAreaList();
     },
-    computed:{
-      //选中的专题
-      selectSubject:{
-        get:function () {
-          let subjects =[];
-          if(this.value.subjectProductRelationList==null||this.value.subjectProductRelationList.length<=0){
-            return subjects;
-          }
-          for(let i=0;i<this.value.subjectProductRelationList.length;i++){
-            subjects.push(this.value.subjectProductRelationList[i].subjectId);
-          }
-          return subjects;
-        },
-        set:function (newValue) {
-          this.value.subjectProductRelationList=[];
-          for(let i=0;i<newValue.length;i++){
-            this.value.subjectProductRelationList.push({subjectId:newValue[i]});
-          }
-        }
-      },
-      //选中的优选
-      selectPrefrenceArea:{
-        get:function () {
-          let prefrenceAreas =[];
-          if(this.value.prefrenceAreaProductRelationList==null||this.value.prefrenceAreaProductRelationList.length<=0){
-            return prefrenceAreas;
-          }
-          for(let i=0;i<this.value.prefrenceAreaProductRelationList.length;i++){
-            prefrenceAreas.push(this.value.prefrenceAreaProductRelationList[i].prefrenceAreaId);
-          }
-          return prefrenceAreas;
-        },
-        set:function (newValue) {
-          this.value.prefrenceAreaProductRelationList=[];
-          for(let i=0;i<newValue.length;i++){
-            this.value.prefrenceAreaProductRelationList.push({prefrenceAreaId:newValue[i]});
-          }
-        }
-      }
-    },
-    methods: {
-      filterMethod(query, item) {
-        return item.label.indexOf(query) > -1;
-      },
-      getSubjectList() {
-        fetchSubjectList().then(response => {
-          let list = response.data;
-          for (let i = 0; i < list.length; i++) {
-            this.subjectList.push({
-              label: list[i].title,
-              key: list[i].id
-            });
-          }
-        });
-      },
-      getPrefrenceAreaList() {
-        fetchPrefrenceAreaList().then(response=>{
-          let list = response.data;
-          for (let i = 0; i < list.length; i++) {
-            this.prefrenceAreaList.push({
-              label: list[i].name,
-              key: list[i].id
-            });
-          }
-        });
-      },
-      handlePrev(){
-        this.$emit('prevStep')
-      },
-      handleFinishCommit(){
-        this.$emit('finishCommit',this.isEdit);
-      }
-    }
   }
+
 </script>
 
 <style scoped>
