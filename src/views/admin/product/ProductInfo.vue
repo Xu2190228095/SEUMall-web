@@ -22,7 +22,7 @@
       <div style="margin-top: 15px">
         <el-form :inline="true" :model="listQuery" label-width="140px">
           <el-form-item label="输入搜索：">
-            <el-input v-model="listQuery.pid" class="input-width" placeholder="商品编号"></el-input>
+            <el-input v-model="listQuery.id" class="input-width" placeholder="商品编号"></el-input>
           </el-form-item>
           <el-form-item label="商品：">
             <el-input v-model="listQuery.pname" class="input-width" placeholder="商品名称"></el-input>
@@ -178,14 +178,13 @@ export default {
     ])
     const list = ref([
       {
-        "pid": 1,
+        "id": 1,
         "pname": "娃哈哈矿泉水",
         "desc": "我们不生产水，我们这是大自然的搬运工",
         "price": 2,
         "number": 1000,
         "img": "...",
         "pclass": "食品",
-        "id": 1
       },
       // {
       //   "pid": 2,
@@ -273,7 +272,7 @@ export default {
     const listQuery = ref({
       pageNum: 1,
       pageSize: 10,
-      pid: null,
+      id: null,
       pname: null,
       pclass: null
     })
@@ -339,7 +338,7 @@ export default {
     }
     function handleResetSearch() {
       listQuery.value.pageNum = 1;
-      listQuery.value.pid = null;
+      listQuery.value.id = null;
       listQuery.value.pname = null;
       listQuery.value.pclass = null;
       getList();
