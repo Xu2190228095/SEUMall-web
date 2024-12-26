@@ -1,11 +1,10 @@
 <template>
+  <simple-header />
     <div class="tab-container">
       <el-tabs v-model="activeTab" :tab-position="tabPosition" class="demo-tabs">     
         <el-tab-pane label="个人资料" name="personalData"></el-tab-pane>
         <el-tab-pane label="过往订单" name="personalOrder"></el-tab-pane>
-        <el-tab-pane label="安全设置" name="securitySettings"></el-tab-pane>
         <el-tab-pane label="收货地址管理" name="deliveryAddressManagement"></el-tab-pane>
-        <el-tab-pane label="页面个性化" name="pagePersonalization"></el-tab-pane>
       </el-tabs>
   
       <div class="right-panel">
@@ -17,6 +16,7 @@
 <script lang="ts" setup>
   import { ref, defineAsyncComponent, onMounted } from 'vue'
   import type { TabsInstance } from 'element-plus'
+  import SimpleHeader from '../../components/SimpleHeader.vue';
 
   const tabPosition = ref<TabsInstance['tabPosition']>('left')
   const activeTab = ref<string>('personalData')
@@ -25,15 +25,13 @@
   const rightComponents = {
     personalData: defineAsyncComponent(() => import('./personalData.vue')),
     personalOrder: defineAsyncComponent(() => import('./userOrder.vue')),
-    securitySettings: defineAsyncComponent(() => import('./securitySettings.vue')),
     deliveryAddressManagement: defineAsyncComponent(() => import('./deliveryAddressManagement.vue')),
-    pagePersonalization: defineAsyncComponent(() => import('./pagePersonalization.vue')),
   }
 
-  // 直接在 `<script setup>` 中使用 `onMounted`
-  onMounted(() => {
-    localStorage.setItem("cid", "1");
-  })
+  // // 直接在 `<script setup>` 中使用 `onMounted`
+  // onMounted(() => {
+  //   localStorage.setItem("cid", "1");
+  // })
 
 </script>
   
@@ -42,6 +40,7 @@
 .tab-container {
 display: flex;
 width: 100%; /* Ensure the container fills the whole viewport */
+margin-top:20px;
 }
 
 /* 控制Tab标签的长度 */
@@ -71,7 +70,7 @@ width: 100%; /* Ensure the container fills the whole viewport */
 
 .right-panel {
 flex: 1; /* Right panel takes the remaining space */
-padding: 16px;
+padding: 10px 16px;
 border-left: 0px solid #ccc; /* Optional border between tabs and content */
 }
 

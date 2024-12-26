@@ -1,17 +1,17 @@
 <template>
   <div class="container">
-    <h1>My Addresses</h1>
+    <h1>我的地址</h1>
 
     <!-- 显示地址列表 -->
     <ul v-if="addresses.length > 0" class="address-list">
       <li v-for="address in addresses" :key="address.id" class="address-item">
         <div class="address-info">
-          <p><strong>Name:</strong> {{ address.name }}</p>
-          <p><strong>Phone:</strong> {{ address.phone }}</p>
-          <p><strong>Address:</strong> {{ address.detailedAddress }}</p>
+          <p><strong>姓名:</strong> {{ address.name }}</p>
+          <p><strong>电话:</strong> {{ address.phone }}</p>
+          <p><strong>地址:</strong> {{ address.detailedAddress }}</p>
         </div>
         <div class="address-actions">
-          <button @click="deleteAddressById(address.id)" class="btn-delete">Delete</button>
+          <button @click="deleteAddressById(address.id)" class="btn-delete">删除</button>
         </div>
       </li>
     </ul>
@@ -19,34 +19,34 @@
     <p v-else>No addresses available.</p>
 
     <!-- 添加新地址按钮 -->
-    <button @click="openAddAddressDialog" class="btn-add">Add New Address</button>
+    <button @click="openAddAddressDialog" class="btn-add">添加新地址</button>
 
     <!-- 弹出添加地址的对话框 -->
     <div v-if="showAddAddressDialog" class="dialog">
       <div class="dialog-content">
-        <h2>Add New Address</h2>
+        <h2>添加新地址</h2>
         <form @submit.prevent="addNewAddress">
-          <label for="name">Name</label>
+          <label for="name">姓名</label>
           <input v-model="newAddress.name" type="text" id="name" required />
 
-          <label for="phone">Phone</label>
+          <label for="phone">电话</label>
           <input v-model="newAddress.phone" type="text" id="phone" required />
 
-          <label for="country">Country</label>
+          <label for="country">国</label>
           <input v-model="newAddress.country" type="text" id="country" required />
 
-          <label for="province">Province</label>
+          <label for="province">省</label>
           <input v-model="newAddress.province" type="text" id="province" required />
 
-          <label for="city">City</label>
+          <label for="city">市</label>
           <input v-model="newAddress.city" type="text" id="city" required />
 
-          <label for="detailedAddress">Detailed Address</label>
+          <label for="detailedAddress">详细地址</label>
           <input v-model="newAddress.detailedAddress" type="text" id="detailedAddress" required />
 
-          <div class="dialog-actions">
-            <button type="submit" class="btn-submit">Add Address</button>
-            <button @click="closeAddAddressDialog" class="btn-cancel" type="button">Cancel</button>
+          <div class="dialog-actions" style = "margin-top: 20px; margin-bottom: 10px;">
+            <button type="submit" class="btn-submit">添加</button>
+            <button @click="closeAddAddressDialog" class="btn-cancel" type="button">取消</button>
           </div>
         </form>
       </div>

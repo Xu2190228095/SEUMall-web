@@ -12,6 +12,8 @@
 
         <!-- 编辑按钮 -->
         <button @click="editProfile" class="btn-edit">编辑</button>
+        <button @click="showRecharge" class="btn-edit">充值</button>
+        
       </div>
 
       <!-- 编辑个人信息 -->
@@ -37,6 +39,16 @@
         <button @click="saveProfile" class="btn-save">保存</button>
         <button @click="cancelEdit" class="btn-cancel">取消</button>
       </div>
+
+      <!-- 充值二维码弹窗 -->
+      <div v-if="isRechargeVisible" class="recharge-popup">
+        <div class="popup-overlay" @click="closeRecharge"></div>
+        <div class="popup-content">
+          <h3>扫描二维码进行充值</h3>
+          <img src="../../assets/images/QRcode.png" alt="充值二维码" class="qr-code" />
+          <button @click="closeRecharge" class="btn-close">关闭</button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -49,6 +61,7 @@ export default {
     return {
       isEditing: false,  // 是否处于编辑模式
       userInfo: {},      // 存储用户信息
+      isRechargeVisible: false,  // 控制充值二维码弹窗的显示
       editData: {        // 存储编辑的用户数据
         username: '',
         account: '',
@@ -99,6 +112,14 @@ export default {
     cancelEdit() {
       this.isEditing = false;
       this.editData = { ...this.userInfo };  // 恢复为原始数据
+    },
+     // 显示充值二维码弹窗
+     showRecharge() {
+      this.isRechargeVisible = true;
+    },
+    // 关闭充值二维码弹窗
+    closeRecharge() {
+      this.isRechargeVisible = false;
     }
   }
 };
@@ -107,7 +128,7 @@ export default {
 <style scoped>
 .user-profile {
   max-width: 90%;
-  margin: 50px auto;
+  margin: 30px auto;
   padding: 40px;
   background-color: #f2f9ff; /* 浅蓝色背景 */
   border-radius: 12px;
@@ -168,6 +189,7 @@ button {
   background-color: #0056b3;
   color: white;
   float: right; /* 编辑按钮右对齐 */
+  margin-left: 20px;
 }
 
 .btn-edit:hover {
@@ -177,6 +199,7 @@ button {
 .btn-save {
   background-color: #28a745;
   color: white;
+  margin-left:38%;
 }
 
 .btn-save:hover {
@@ -191,6 +214,68 @@ button {
 
 .btn-cancel:hover {
   background-color: #c82333; /* 取消按钮悬停效果 */
+}
+
+/* 弹窗样式 */
+.recharge-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.popup-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.popup-content {
+  background-color: white;
+  padding: 30px;
+  border-radius: 10px;
+  text-align: center;
+  max-width: 400px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.popup-content h3 {
+  font-size: 20px;
+  color: #333;
+  margin-bottom: 20px;  /* 增加标题和二维码之间的间距 */
+}
+
+.qr-code {
+  width: 100%;
+  max-width: 200px;
+  margin: 0;  /* 移除外边距，确保二维码居中 */
+}
+
+.btn-close {
+  background-color: #dc3545;
+  color: white;
+  padding: 12px 24px;
+  font-size: 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-top: 20px;  /* 按钮与二维码之间的间距 */
+}
+
+.btn-close:hover {
+  background-color: #c82333;
 }
 
 /* 使用flexbox将按钮居中 */
