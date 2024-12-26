@@ -56,15 +56,6 @@
           </div>
         </div>
 
-        <!-- 写评论模块 -->
-        <div class="writeCommentBox">
-          <textarea v-model="newComment.content" placeholder="写下您的评论..." rows="4" style="width: 100%;"></textarea>
-
-          <!-- 新增评分组件 -->
-          <el-rate v-model="newComment.score" :max="5" show-text text-color="#ff9900" score-template="{value}" />
-
-          <el-button type="primary" @click="submitComment">提交评论</el-button>
-        </div>
 
         <section class="msgBox leftContainer">
           <ul class="tagList">
@@ -254,8 +245,8 @@ export default {
       curIndex: 0,
           rate: 4.5,
           pageData: {
-            total: 5,
-            limit: 3,
+            total: 15,
+            limit: 5,
             page: 1
           },
           commentList: [
