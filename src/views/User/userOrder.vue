@@ -19,6 +19,7 @@
     <div class="order-container">
       <div v-for="(order, index) in orders" :key="order.order_id" class="order-item">
         <div class="order-details">
+          <img :src="images[index]" class="product-image" style="border-radius: 10px;"/>
           <div class="order-info">
             <span class="order-label">订单编号:</span> <span>{{ order.order_id }}</span>
           </div>
@@ -110,8 +111,11 @@ export default {
     function getList() {
       getOrdersByUserId(listQuery.value)
         .then((response) => {
+          console.log(response);
           orders.value = response.data.orders;
-          images.value = response.data.pictures;
+          console.log(orders.value);
+          images.value = response.data.pictures.map(picture => `data:image/jpg;base64,${picture}`);
+          console.log(images.value);
         })
         .catch((error) => {
           console.error(error);
@@ -158,6 +162,7 @@ export default {
     return {
       statusOptions,
       orders,
+      images,
       listQuery,
       reviewDialogVisible,
       reviewScore,
