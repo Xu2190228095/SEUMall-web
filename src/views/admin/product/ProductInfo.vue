@@ -52,11 +52,11 @@
                 @selection-change="handleSelectionChange"
                 v-loading="listLoading" border>
         <el-table-column type="selection" width="60" align="center"></el-table-column>
-        <el-table-column label="编号" width="80" align="center">
-          <template #default="scope">{{scope.row.id}}</template>
-        </el-table-column>
+<!--        <el-table-column label="编号" width="80" align="center">-->
+<!--          <template #default="scope">{{scope.row.id}}</template>-->
+<!--        </el-table-column>-->
         <el-table-column label="商品编号" width="80" align="center">
-          <template #default="scope">{{scope.row.pid}}</template>
+          <template #default="scope">{{scope.row.id}}</template>
         </el-table-column>
         <el-table-column label="商品名称" width="180" align="center">
           <template #default="scope">{{scope.row.pname}}</template>
