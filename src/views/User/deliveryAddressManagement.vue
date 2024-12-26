@@ -8,7 +8,7 @@
         <div class="address-info">
           <p><strong>姓名:</strong> {{ address.name }}</p>
           <p><strong>电话:</strong> {{ address.phone }}</p>
-          <p><strong>地址:</strong> {{ address.detailedAddress }}</p>
+          <p><strong>地址:</strong> {{ address.country + address.province + address.city + address.detailedAddress }}</p>
         </div>
         <div class="address-actions">
           <button @click="deleteAddressById(address.id)" class="btn-delete">删除</button>
