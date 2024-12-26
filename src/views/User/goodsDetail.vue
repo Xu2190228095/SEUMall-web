@@ -323,8 +323,6 @@ export default {
       overflow: hidden;
 
       .item-detail-big-img img {
-        width: 68px;
-        height: 68px;
         width: 100%;
       }
 
