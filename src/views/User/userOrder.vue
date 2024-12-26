@@ -19,10 +19,18 @@
     <div class="order-container">
       <div v-for="(order, index) in orders" :key="order.order_id" class="order-item">
         <div class="order-details">
-          <span class="order-label">订单编号:</span> {{ order.order_id }}
-          <span class="order-label">提交时间:</span> {{ order.create_time }}
-          <span class="order-label">订单金额:</span> ￥{{ order.price }}
-          <span class="order-label">订单状态:</span> {{ order.state }}
+          <div class="order-info">
+            <span class="order-label">订单编号:</span> <span>{{ order.order_id }}</span>
+          </div>
+          <div class="order-info">
+            <span class="order-label">提交时间:</span> <span>{{ order.create_time }}</span>
+          </div>
+          <div class="order-info">
+            <span class="order-label">订单金额:</span> <span>￥{{ order.price }}</span>
+          </div>
+          <div class="order-info">
+            <span class="order-label">订单状态:</span> <span>{{ order.state }}</span>
+          </div>
         </div>
         <div class="order-actions">
           <el-button
@@ -195,10 +203,6 @@ export default {
   padding: 15px;
 }
 
-.input-width {
-  width: 250px;
-}
-
 /* 标签部分 */
 .el-tabs {
   margin-bottom: 20px;
@@ -221,54 +225,68 @@ export default {
 /* 订单列表部分 */
 .order-item {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 20px;
+  flex-direction: column;
+  padding: 20px 30px;
   margin-bottom: 20px;
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  height: auto; /* 使订单项高度适应内容 */
+}
+
+.order-item .order-details {
+  margin-bottom: 20px;
 }
 
 .order-item .order-info {
   display: flex;
-  flex-direction: column;
+  margin-bottom: 10px; /* 间距 */
+  font-size: 18px; /* 字体大小 */
 }
 
-.order-item .order-info span {
-  margin-bottom: 30px; /* 增加信息之间的间距 */
-  margin-right: 10px;
-  font-size: 20px; /* 字体变大 */
+.order-item .order-info .order-label {
+  font-weight: 600;
+  margin-right: 8px; /* 标签和内容之间的间距 */
 }
 
-.order-item .action-buttons {
+.order-item .order-actions {
   display: flex;
-  gap: 20px; /* 按钮之间增加间距 */
+  gap: 25px; /* 按钮之间增加间距 */
   justify-content: flex-end;
 }
 
-.order-item .action-buttons .el-button {
-  font-size: 20px; /* 按钮字体变大 */
-  padding: 40px; /* 增加按钮的大小 */
+.order-item .order-actions .el-button {
+  font-size: 18px; /* 按钮字体变大 */
+  padding: 20px; /* 增加按钮的大小 */
 }
 
-.order-item .action-buttons .el-button--primary {
+.order-item .order-actions .el-button--primary {
   background-color: #409EFF;
   color: white;
 }
 
-.order-item .action-buttons .el-button--danger {
+.order-item .order-actions .el-button--danger {
   background-color: #f56c6c;
   color: white;
 }
 
 /* 修改评价框 */
 .el-rate {
-  font-size: 25px; /* 星星的大小 */
+  font-size: 18px; /* 星星的大小 */
 }
 
 .el-dialog {
   border-radius: 8px;
+}
+
+.el-dialog .el-dialog__body {
+  padding-bottom: 30px; /* 给评价框下面增加空间 */
+}
+
+.el-dialog .el-button {
+  font-size: 18px; /* 按钮字体变大 */
+  padding: 20px; /* 按钮大小调整 */
+  margin-top: 15px; /* 按钮与评价框之间增加间距 */
 }
 
 .el-steps {
@@ -289,20 +307,5 @@ export default {
 
 .el-steps .el-step.is-active .el-step__title {
   color: #f56c6c;
-}
-
-/* 响应式调整 */
-@media (max-width: 768px) {
-  .input-width {
-    width: 100%;
-  }
-
-  .el-table-column {
-    font-size: 20px;
-  }
-
-  .el-dialog {
-    width: 90%;
-  }
 }
 </style>
