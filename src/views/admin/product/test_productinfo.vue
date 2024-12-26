@@ -1,403 +1,245 @@
-<template>
-  <div class="app-container">
-    <el-card class="filter-container" shadow="never">
-      <div>
-        <i class="el-icon-search"></i>
-        <span>筛选搜索</span>
-        <el-button
-            style="float:right"
-            type="primary"
-            @click="handleSearchList()"
-            size="small">
-          查询搜索
-        </el-button>
-        <el-button
-            style="float:right;margin-right: 15px"
-            @click="handleResetSearch()"
-            size="small">
-          重置
-        </el-button>
-      </div>
-
-      <div style="margin-top: 15px">
-        <el-form :inline="true" :model="listQuery" label-width="140px">
-          <el-form-item label="输入搜索：">
-            <el-input v-model="listQuery.pid" class="input-width" placeholder="商品编号"></el-input>
-          </el-form-item>
-          <el-form-item label="商品：">
-            <el-input v-model="listQuery.pname" class="input-width" placeholder="商品名称"></el-input>
-          </el-form-item>
-          <el-form-item label="商品分类：">
-            <el-select v-model="listQuery.pclass" class="input-width" placeholder="全部" clearable>
-              <el-option v-for="item in classOptions"
-                         :key="item.value"
-                         :label="item.label"
-                         :value="item.value">
-              </el-option>
-            </el-select>
-          </el-form-item>
-        </el-form>
-      </div>
-
-    </el-card>
-    <el-card class="operate-container" shadow="never">
-      <i class="el-icon-tickets"></i>
-      <span>数据列表</span>
-    </el-card>
-
-    <div class="table-container">
-      <el-table ref="productTable"
-                :data="list"
-                style="width: 100%;"
-                @selection-change="handleSelectionChange"
-                v-loading="listLoading" border>
-        <el-table-column type="selection" width="60" align="center"></el-table-column>
-        <el-table-column label="编号" width="80" align="center">
-          <template #default="scope">{{scope.row.id}}</template>
-        </el-table-column>
-        <el-table-column label="商品编号" width="80" align="center">
-          <template #default="scope">{{scope.row.pid}}</template>
-        </el-table-column>
-        <el-table-column label="商品名称" width="180" align="center">
-          <template #default="scope">{{scope.row.pname}}</template>
-        </el-table-column>
-        <el-table-column label="商品描述" width="180" align="center">
-          <template #default="scope">{{scope.row.desc}}</template>
-        </el-table-column>
-        <el-table-column label="商品图片" align="center">
-          <template #default="scope">{{scope.row.img}}</template>
-        </el-table-column>
-        <el-table-column label="商品金额" width="120" align="center">
-          <template #default="scope">￥{{scope.row.price}}</template>
-        </el-table-column>
-        <el-table-column label="商品数量" width="120" align="center">
-          <template #default="scope">{{scope.row.number}}</template>
-        </el-table-column>
-        <el-table-column label="商品分类" width="120" align="center">
-          <template #default="scope">{{scope.row.pclass}}</template>
-        </el-table-column>
-        <el-table-column label="操作" width="300" align="center">
-          <template #default="scope">
-            <el-button
-                size="mini"
-                @click="handleViewOrder(scope.$index, scope.row)"
-            >查看订单</el-button>
-            <el-button
-                size="mini"
-                @click="handleDeliveryOrder(scope.$index, scope.row)"
-                v-show="scope.row.state==='待发货'">订单发货</el-button>
-            <el-button
-                size="mini"
-                @click="handleViewLogistics(scope.$index, scope.row)"
-                v-show="scope.row.state==='已发货' || scope.row.state==='已收货'">订单跟踪</el-button>
-            <el-button
-                size="mini"
-                type="danger"
-                @click="handleDeleteOrder(scope.$index, scope.row)"
-                v-show="scope.row.state==='已完成'">删除订单</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+<template> 
+  <el-card class="form-container" shadow="never">
+    <div class="centered-title-container">
+      <h1>填写商品信息</h1>
     </div>
-
-    <div class="batch-operate-container">
-      <el-select
-          style="width: 100px"
-          v-model="operateType" placeholder="批量操作">
-        <el-option
-            v-for="item in operateOptions"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
-        </el-option>
-      </el-select>
-      <el-button
-          style="margin-left: 20px"
-          class="search-button"
-          @click="handleBatchOperate()"
-          type="primary">
-        确定
-      </el-button>
+    <div style="margin-top: 50px">
+      <el-form :model="value" :rules="rules" ref="productInfoForm" label-width="120px" class="form-inner-container" size="small">
+        <el-form-item label="商品分类：" prop="productCategoryId">
+          <el-cascader
+              v-model="selectProductCateValue"
+              :options="productCateOptions">
+          </el-cascader>
+        </el-form-item>
+        <el-form-item label="商品名称：" prop="name">
+          <el-input v-model="value.name"></el-input>
+        </el-form-item>
+        <el-form-item label="副标题：" prop="subTitle">
+          <el-input v-model="value.subTitle"></el-input>
+        </el-form-item>
+        <el-form-item label="商品品牌：" prop="brandId">
+          <el-select
+              v-model="value.brandId"
+              @change="handleBrandChange"
+              placeholder="请选择品牌">
+            <el-option
+                v-for="item in brandOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="商品介绍：">
+          <el-input
+              :autoSize="true"
+              v-model="value.description"
+              type="textarea"
+              placeholder="请输入内容"></el-input>
+        </el-form-item>
+        <el-form-item label="商品货号：">
+          <el-input v-model="value.productSn"></el-input>
+        </el-form-item>
+        <el-form-item label="商品售价：">
+          <el-input v-model="value.price"></el-input>
+        </el-form-item>
+        <!--      <el-form-item label="市场价：">-->
+        <!--        <el-input v-model="value.originalPrice"></el-input>-->
+        <!--      </el-form-item>-->
+        <el-form-item label="商品库存：">
+          <el-input v-model="value.stock"></el-input>
+        </el-form-item>
+        <el-form-item label="计量单位：">
+          <el-input v-model="value.unit"></el-input>
+        </el-form-item>
+        <el-form-item style="text-align: center">
+          <el-button type="primary" size="medium" @click="handleNext('productInfoForm')">下一步</el-button>
+        </el-form-item>
+      </el-form>
     </div>
+  </el-card>
 
-    <div class="pagination-container">
-      <el-pagination
-          background
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-          layout="total, sizes,prev, pager, next,jumper"
-          :current-page.sync="listQuery.pageNum"
-          :page-size="listQuery.pageSize"
-          :page-sizes="[5,10,15]"
-          :total="total">
-      </el-pagination>
-    </div>
-
-    <el-dialog title="订单跟踪"
-               v-model="logisticsDialogVisible"
-               :before-close="handleLogisticsDialogClose"
-               align-center
-               width="40%">
-      <el-steps direction="vertical"
-                :active="6"
-                finish-status="success"
-                space="50px">
-        <el-step  v-for="item in defaultLogisticsList"
-                  :key="item.name"
-                  :title="item.name"
-                  :description="item.time"></el-step>
-      </el-steps>
-    </el-dialog>
-
-  </div>
 </template>
 <script>
-import { reactive, ref, onMounted, getCurrentInstance } from 'vue'
-import router from '../../../router';
-import { fetchList } from '@/api/product'
+import ProductInfoDetail from './AddProductComponents/Add_productinfo.vue';
 
+const defaultProductParam = {
+  albumPics: '',
+  brandId: null,
+  brandName: '',
+  deleteStatus: 0,
+  description: '',
+  detailDesc: '',
+  detailHtml: '',
+  detailMobileHtml: '',
+  detailTitle: '',
+  feightTemplateId: 0,
+  flashPromotionCount: 0,
+  flashPromotionId: 0,
+  flashPromotionPrice: 0,
+  flashPromotionSort: 0,
+  giftPoint: 0,
+  giftGrowth: 0,
+  keywords: '',
+  lowStock: 0,
+  name: '',
+  newStatus: 0,
+  note: '',
+  originalPrice: 0,
+  pic: '',
+  //会员价格{memberLevelId: 0,memberPrice: 0,memberLevelName: null}
+  memberPriceList: [],
+  //商品满减
+  productFullReductionList: [{fullPrice: 0, reducePrice: 0}],
+  //商品阶梯价格
+  productLadderList: [{count: 0,discount: 0,price: 0}],
+  previewStatus: 0,
+  price: 0,
+  productAttributeCategoryId: null,
+  //商品属性相关{productAttributeId: 0, value: ''}
+  productAttributeValueList: [],
+  //商品sku库存信息{lowStock: 0, pic: '', price: 0, sale: 0, skuCode: '', spData: '', stock: 0}
+  skuStockList: [],
+  //商品相关专题{subjectId: 0}
+  subjectProductRelationList: [],
+  //商品相关优选{prefrenceAreaId: 0}
+  prefrenceAreaProductRelationList: [],
+  productCategoryId: null,
+  productCategoryName: '',
+  productSn: '',
+  promotionEndTime: '',
+  promotionPerLimit: 0,
+  promotionPrice: null,
+  promotionStartTime: '',
+  promotionType: 0,
+  publishStatus: 0,
+  recommandStatus: 0,
+  sale: 0,
+  serviceIds: '',
+  sort: 0,
+  stock: 0,
+  subTitle: '',
+  unit: '',
+  usePointLimit: 0,
+  verifyStatus: 0,
+  weight: 0
+};
 export default {
-  setup() {
-    const classOptions = ref([
-      {
-        label: '全部',
-        value: null
-      },
-      {
-        label: '食品',
-        value: '食品'
-      },
-      {
-        label: '电子产品',
-        value: '电子产品'
-      },
-      {
-        label: '家电',
-        value: '家电'
-      }
-    ])
-    const list = ref([
-      {
-        "pid": 1,
-        "pname": "娃哈哈矿泉水",
-        "desc": "我们不生产水，我们这是大自然的搬运工",
-        "price": 2,
-        "number": 1000,
-        "img": "...",
-        "pclass": "食品",
-        "id": 1
-      },
-      // {
-      //   "pid": 2,
-      //   "pname": "可口可乐",
-      //   "desc": "清爽解渴，经典之选",
-      //   "price": 3,
-      //   "number": 1500,
-      //   "img": "...",
-      //   "pclass": "饮料",
-      //   "id": 2
-      // },
-      // {
-      //   "pid": 3,
-      //   "pname": "康师傅红烧牛肉面",
-      //   "desc": "经典味道，速食必备",
-      //   "price": 5,
-      //   "number": 800,
-      //   "img": "...",
-      //   "pclass": "食品",
-      //   "id": 3
-      // },
-      // {
-      //   "pid": 4,
-      //   "pname": "蒙牛纯牛奶",
-      //   "desc": "富含营养，健康之选",
-      //   "price": 10,
-      //   "number": 600,
-      //   "img": "...",
-      //   "pclass": "食品",
-      //   "id": 4
-      // },
-      // {
-      //   "pid": 5,
-      //   "pname": "苹果iPhone 13",
-      //   "desc": "最新款智能手机，高性能体验",
-      //   "price": 6999,
-      //   "number": 200,
-      //   "img": "...",
-      //   "pclass": "电子产品",
-      //   "id": 5
-      // },
-      // {
-      //   "pid": 6,
-      //   "pname": "联想小新Pro14",
-      //   "desc": "轻薄便携，高效办公",
-      //   "price": 5999,
-      //   "number": 100,
-      //   "img": "...",
-      //   "pclass": "电子产品",
-      //   "id": 6
-      // },
-      // {
-      //   "pid": 7,
-      //   "pname": "海尔滚筒洗衣机",
-      //   "desc": "智能控制，节能环保",
-      //   "price": 2999,
-      //   "number": 50,
-      //   "img": "...",
-      //   "pclass": "家电",
-      //   "id": 7
-      // },
-      // {
-      //   "pid": 8,
-      //   "pname": "美的智能冰箱",
-      //   "desc": "大容量，智能保鲜",
-      //   "price": 3999,
-      //   "number": 80,
-      //   "img": "...",
-      //   "pclass": "家电",
-      //   "id": 8
-      // }
-    ])
-    const multipleSelection = ref([])
-    const listLoading = ref(false)
-    const logisticsDialogVisible = ref(false)
-    const defaultLogisticsList=[
-      {name: '订单已提交，等待付款',time:'2017-04-01 12:00:00 '},
-      {name: '订单付款成功',time:'2017-04-01 12:00:00 '},
-      {name: '在北京市进行下级地点扫描，等待付款',time:'2017-04-01 12:00:00 '},
-      {name: '在分拨中心广东深圳公司进行卸车扫描，等待付款',time:'2017-04-01 12:00:00 '},
-      {name: '在广东深圳公司进行发出扫描',time:'2017-04-01 12:00:00 '},
-      {name: '到达目的地网点广东深圳公司，快件将很快进行派送',time:'2017-04-01 12:00:00 '},
-      {name: '订单已签收，期待再次为您服务',time:'2017-04-01 12:00:00 '}
-    ];
-    const listQuery = ref({
-      pageNum: 1,
-      pageSize: 10,
-      pid: null,
-      pname: null,
-      pclass: null
-    })
-    const total = ref(0)
-    const operateType = ref(null)
-    const operateOptions = [
-      {
-        label: "批量上架",
-        value: 1
-      },
-      {
-        label: "批量删除",
-        value: 2
-      },
-    ]
-    function handleSelectionChange(val) {
-      multipleSelection.value = val;
+  name: 'ProductDetail',
+  props: {
+    isEdit: {
+      type: Boolean,
+      default: false
     }
-    function handleViewOrder(index, row) {
-      console.log(index, row)
-      router.push('/admin/order_detail')
-    }
-    function handleDeliveryOrder(index, row) {
-      const deliveryForm = {
-        id: row.id,
-        expressCompany: '顺丰快递',
-        expressNo: '1234567890',
-        expressName: '张三',
-        expressMobile: '13812345678',
-        expressAddress: '广东省深圳市南山区',
-      }
-      updateOrderStatus(deliveryForm).then(response => {
-        console.log(response)
-      }).catch(error => {
-      })
-      getList();
-    }
-    function handleViewLogistics(index, row) {
-      logisticsDialogVisible.value = true; //to do
-    }
-    function handleDeleteOrder(index, row) {
-      const id = {
-        id: row.id
-      }
-      deleteOrder(id).then(response => {
-      }).catch(error => {
-        console.log(error);
-      });
-      getList();
-    }
-    function handleLogisticsDialogClose(done) {
-      logisticsDialogVisible.value = false;
-      done();
-    }
-    function handleSizeChange(val) {
-      listQuery.value.pageNum = 1;
-      listQuery.value.pageSize = val;
-      getList();
-    }
-    function handleCurrentChange(val) {
-      listQuery.value.pageNum = val;
-      getList();
-    }
-    function handleResetSearch() {
-      listQuery.value.pageNum = 1;
-      listQuery.value.pid = null;
-      listQuery.value.pname = null;
-      listQuery.value.pclass = null;
-      getList();
-    }
-    function handleSearchList() {
-      listQuery.value.pageNum = 1;
-      console.log(listQuery.value);
-      getList();
-    }
-    function getList() {
-      // listLoading.value = true;
-      fetchList(listQuery.value).then(res => {
-        listLoading.value = false;
-        list.value = res.data.list;
-        total.value = res.data.total;
-        console.log(list.value)
-        console.log(total.value)
-      }).catch(err => {
-        listLoading.value = false;
-        console.log(err);
-      });
-    }
-
-    function handleBatchOperate() {
-      console.log(operateType.value, multipleSelection.value)  //to do
-    }
-    onMounted(() => {
-      getList();
-    })
+  },
+  data() {
     return {
-      classOptions,
-      list,
-      multipleSelection,
-      listLoading,
-      logisticsDialogVisible,
-      defaultLogisticsList,
-      listQuery,
-      total,
-      operateType,
-      operateOptions,
-      handleSelectionChange,
-      handleViewOrder,
-      handleDeliveryOrder,
-      handleViewLogistics,
-      handleDeleteOrder,
-      handleLogisticsDialogClose,
-      handleSizeChange,
-      handleCurrentChange,
-      handleBatchOperate,
-      handleResetSearch,
-      handleSearchList,
+      active: 0,
+      productParam: Object.assign({}, defaultProductParam),
+      showStatus: [true, false, false, false],
+      hasEditCreated:false,
+      //选中商品分类的值
+      selectProductCateValue: [],
+      productCateOptions: [
+        {
+          label: '饮料',
+          value: '饮料'
+        },
+        {
+          label: '手机',
+          value: '手机'
+        },
+        {
+          label: '电脑',
+          value: '电脑'
+        }],
+      brandOptions: [{
+        label: '小米',
+        value: '小米'
+      }],
+      value:Object.assign({}, defaultProductParam),
+      rules: {
+        name: [
+          {required: true, message: '请输入商品名称', trigger: 'blur'},
+          {min: 2, max: 140, message: '长度在 2 到 140 个字符', trigger: 'blur'}
+        ],
+        subTitle: [{required: true, message: '请输入商品副标题', trigger: 'blur'}],
+        productCategoryId: [{required: true, message: '请选择商品分类', trigger: 'blur'}],
+        brandId: [{required: true, message: '请选择商品品牌', trigger: 'blur'}],
+        description: [{required: true, message: '请输入商品介绍', trigger: 'blur'}],
+        requiredProp: [{required: true, message: '该项为必填项', trigger: 'blur'}]
+      }
+
+    }
+  },
+  created(){
+    if(this.isEdit){
+      getProduct(this.$route.query.id).then(response=>{
+        this.productParam=response.data;
+      });
+    }
+  },
+  methods: {
+    hideAll() {
+      for (let i = 0; i < this.showStatus.length; i++) {
+        this.showStatus[i] = false;
+      }
+    },
+    prevStep() {
+      if (this.active > 0 && this.active < this.showStatus.length) {
+        this.active--;
+        this.hideAll();
+        this.showStatus[this.active] = true;
+      }
+    },
+    nextStep() {
+      if (this.active < this.showStatus.length - 1) {
+        this.active++;
+        this.hideAll();
+        this.showStatus[this.active] = true;
+      }
+    },
+    finishCommit(isEdit) {
+      this.$confirm('是否要提交该产品', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        if(isEdit){
+          updateProduct(this.$route.query.id,this.productParam).then(response=>{
+            this.$message({
+              type: 'success',
+              message: '提交成功',
+              duration:1000
+            });
+            this.$router.back();
+          });
+        }else{
+          createProduct(this.productParam).then(response=>{
+            this.$message({
+              type: 'success',
+              message: '提交成功',
+              duration:1000
+            });
+            location.reload();
+          });
+        }
+      })
     }
   }
 }
-
 </script>
-<style scoped>
-.input-width {
-  width: 203px;
+<style>
+.centered-title-container {
+  text-align: center;
+  margin-top: 50px; /* 可选：增加一些顶部间距 */
+}
+.form-container {
+  width: 960px;
+}
+.form-inner-container {
+  width: 800px;
 }
 </style>
+<script setup lang="ts">
+</script>
