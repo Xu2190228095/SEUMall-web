@@ -81,7 +81,7 @@
             <el-button
                 size="mini"
                 @click="handleViewOrder(scope.$index, scope.row)"
-            >查看订单</el-button>
+            >编辑商品</el-button>
             <el-button
                 size="mini"
                 @click="handleDeliveryOrder(scope.$index, scope.row)"
