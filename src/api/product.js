@@ -53,3 +53,11 @@ export function fetchList(params) {
         params
     });
 }
+
+export function addProduct(params) {
+    return request({
+        url: '/product/insert',
+        method: 'get',
+        params
+    });
+}
