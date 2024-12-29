@@ -27,29 +27,6 @@
         <el-form-item label="商品库存：">
           <el-input v-model="value.number"></el-input>
         </el-form-item>
-        <el-form-item label="上传图片">
-          <el-upload
-              class="upload-demo"
-              action="https://jsonplaceholder.typicode.com/posts/"
-              :on-preview="handlePreview"
-              :on-remove="handleRemove"
-              :file-list="fileList"
-              list-type="picture">
-            <el-button size="small" type="primary">点击上传</el-button>
-            <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
-          </el-upload>
-        </el-form-item>
-
-        <el-upload action="https://jsonplaceholder.typicode.com/posts/" multiple list-type="picture-card" :data="fileData" name="img"
-                   accept="image/jpeg,image/png,image/jpg" :on-preview="handlePictureCardPreview" :on-remove="handleRemove"
-                   :on-success="handleimg">
-          <el-icon>
-            <Plus />
-          </el-icon>
-          <template #tip>
-            <div class="el-upload__tip">只能上传jpg/png/jpeg文件，且单个不超过2M</div>
-          </template>
-        </el-upload>
         <el-dialog v-model="dialogVisible">
           <img w-full :src="imageUrl" alt="Preview Image" />
         </el-dialog>
@@ -202,50 +179,6 @@ export default {
     }
   },
   methods: {
-
-    handleRemove(img, fileList) {
-      console.log(img, fileList);
-    },
-    handlePictureCardPreview(img) {//这里需要注意 用的img并不是file，因为接口文档给的是img，我们在upload中定义个name=“img”参数就可以了
-      // 检查文件类型
-      const isImage = img.raw.type.includes("image");
-      if (!isImage) {
-        this.$message.error("上传文件类型必须是图片!");
-        return false
-      }
-      // 检查文件大小
-      if (img.size > (2 * 1024 * 1024)) {
-        this.$message.error(`上传文件大小不能超过10Mb`);
-        this.$refs['refUpload'].handleRemove(img);
-        return false;
-      }
-      // 检查文件数量
-      if (fileList.length > 1) {
-        this.$message.error(`上传文件最大数量为1`);
-        this.$refs['refUpload'].handleRemove(img);
-        return false;
-      }
-      this.ImageUrl = img.url;
-      this.dialogVisible = true;
-    },
-    handleimg(res, img, fileList) {
-      console.log(img);
-      console.log(fileList);
-      if (res.code === 200) {
-        this.url = res.data.file
-      } else {
-        this.$message.error(`图片${img.name}上传失败`)
-      }
-    },
-    handlePreview(file) {
-      console.log(file);
-    },
-    //处理编辑逻辑
-    handleEditCreated(){
-      if(this.value.pclass!=null){
-        this.selectProductCateValue.push(this.value.pclass);
-      }
-    },
     getCateNameById(id){
       let name=null;
       for(let i=0;i<this.productCateOptions.length;i++){
