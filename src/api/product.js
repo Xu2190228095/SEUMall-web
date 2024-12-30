@@ -61,3 +61,11 @@ export function addProduct(params) {
         params
     });
 }
+
+export function deleteProduct(params) {
+    return request({
+        url: '/product/delete',
+        method: 'get',
+        params
+    });
+}

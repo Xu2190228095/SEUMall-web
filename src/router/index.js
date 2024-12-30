@@ -28,7 +28,7 @@ const router = new createRouter({
       {
           path: '/try_test', //佟若祎专门用来测试的页面
           name: 'try_test',
-          component: () => import('@/views/admin/product/test_1229_upload.vue')
+          component: () => import('@/views/admin/product/test_1230_delete.vue')
       },
       {
           path: '/product',

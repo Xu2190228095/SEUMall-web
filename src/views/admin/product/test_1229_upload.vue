@@ -1,15 +1,9 @@
 <template>
-  <!-- <el-table :data="tableData" style="width: 100%"> -->
-  <!--    <el-table-column prop="deptno" label="deptno" width="180"></el-table-column>-->
-  <!--    <el-table-column prop="dname" label="dname" width="180"></el-table-column>-->
-  <!--    <el-table-column prop="loc" label="loc"></el-table-column>-->
-  <!-- <el-table-column prop="id" label="id" width="180"></el-table-column>
-  <el-table-column prop="username" label="username" width="180"></el-table-column>
-  <el-table-column prop="password" label="password"></el-table-column>
-</el-table> -->
+
   <el-input v-model="inputValue" placeholder="请输入文件地址" style="width: 40%"></el-input>
   <el-button type="primary" @click="handleClick">下载文件</el-button>
   <el-image :src="image" style="width: 100%"></el-image>
+
 
   <el-upload
       v-model:file-list="fileList"
@@ -46,36 +40,19 @@ export default {
     const instance = getCurrentInstance();
     const $axios = instance.appContext.config.globalProperties.$axios;
 
-    // onMounted(async () => {
-    //   try {
-    //     // const response = await $axios.get('/dept/list')
-    //     const response = await $axios.get('/user/list')
-    //     tableData.value = response.data
-    //     // 在这里打印数据
-    //     console.log('Fetched User Data:', tableData.value);
-    //   } catch (error) {
-    //     console.error('Failed to fetch data:', error)
-    //   }
-    // })
-
     const inputValue = ref('')
 
     const image = ref('')
 
     function handleClick() {
       console.log('Clicked:', inputValue.value)
+      const origin_url='/image/list?originUrl_info='+inputValue.value
+      console.log('origin_url', origin_url)
 
-      // const response = axios.get('/image/list', {
-      //   params: {
-      //     originUrl_info: 'iphone16_img',
-      //   }
-      //   }).then(response => {
-      //     // 处理响应数据
-      //     console.log(response.data);
-      //   })
       const response = $axios({
         method: 'get',
-        url: '/image/list?originUrl_info=iphone16_img',
+        // url: '/image/list?originUrl_info=iphone16_img',
+        url: origin_url,
         data:{
           // params: {originUrl_info: 'iphone16_img',}
         },})
@@ -83,33 +60,28 @@ export default {
             console.log('Data posted:', response.data);
             const data2=response.data;
             console.log('URL', data2.remoteUrl);
-      })
-      console.log('222222222');
 
-
-
-        try {
-          // const response = await $axios.post('/dept/add', {
-          const response = $axios({
-            method: 'post',
-            url: '/fastdfs/download',
-            data: inputValue.value,
-            responseType: 'blob',
-            headers: {
-              'Content-Type': 'text/plain'
+            try {
+              // 用远程URL去找
+              const response = $axios({
+                method: 'post',
+                url: '/fastdfs/download',
+                data: data2.remoteUrl,
+                responseType: 'blob',
+                headers: {
+                  'Content-Type': 'text/plain'
+                }
+              }).then(response => {
+                const url = window.URL.createObjectURL(new Blob([response.data], {type: 'image/jpg'}));
+                image.value = url;
+              })
+            } catch (error) {
+              console.error('Failed to fetch data:', error)
             }
-          }).then(response => {
-            const url = window.URL.createObjectURL(new Blob([response.data], {type: 'image/jpg'}));
-            image.value = url;
-            // const link = document.createElement('a');
-            // link.href = url;
-            // link.setAttribute('download', 'download.jpg');
-            // document.body.appendChild(link);
-            // link.click();
-          })
-        } catch (error) {
-          console.error('Failed to fetch data:', error)
-        }
+      })
+
+
+
 
     }
 
