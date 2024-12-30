@@ -19,7 +19,7 @@
     <div class="order-container">
       <div v-for="(order, index) in orders" :key="order.order_id" class="order-item">
         <div class="order-details">
-          <img :src="images[index]" class="product-image" style="border-radius: 10px;"/>
+          <!-- <img :src="images[index]" class="product-image" style="border-radius: 10px;"/> -->
           <div class="order-info">
             <span class="order-label">订单编号:</span> <span>{{ order.order_id }}</span>
           </div>
@@ -31,18 +31,22 @@
           </div>
           <div class="order-info">
             <span class="order-label">订单状态:</span> <span>{{ order.state }}</span>
-          </div>
+          </div>        
         </div>
+
+        <!-- 商品图片部分
+        <img :src="images[index]" class="product-image" /> -->
+
         <div class="order-actions">
           <el-button
-            v-show="order.state === '已发货' || order.state === '已收货'"
+            v-show="order.state === '已发货'"
             size="small"
             @click="handleConfirmReceipt(order)"
           >
             确认收货
           </el-button>
           <el-button
-            v-show="order.state === '已完成'"
+            v-show="order.state === '已收货'"
             size="small"
             @click="handleOpenReview(order)"
           >
@@ -79,7 +83,7 @@
 
 <script>
 import { reactive, ref, onMounted } from 'vue';
-import { getOrdersByUserId, updateOrderStatus } from '../../api/order';
+import { getOrdersByUserId, submitReview, confirmReceipt } from '../../api/order';
 
 export default {
   setup() {
@@ -94,7 +98,7 @@ export default {
 
     // 订单数据
     const orders = ref([]);
-    const images = ref([]); // 商品图片
+    //const images = ref([]); // 商品图片
     const listQuery = ref({
       pageNum: 1,
       pageSize: 10,
@@ -106,6 +110,7 @@ export default {
     const reviewDialogVisible = ref(false);
     const reviewScore = ref(0);
     const reviewText = ref('');
+    const currentOrder = ref(null); // 当前正在评论的订单
 
     // 获取订单数据
     function getList() {
@@ -114,8 +119,8 @@ export default {
           console.log(response);
           orders.value = response.data.orders;
           console.log(orders.value);
-          images.value = response.data.pictures.map(picture => `data:image/jpg;base64,${picture}`);
-          console.log(images.value);
+          //images.value = response.data.pictures.map(picture => `data:image/jpg;base64,${picture}`);
+          //console.log(images.value);
         })
         .catch((error) => {
           console.error(error);
@@ -128,15 +133,36 @@ export default {
       getList();
     }
 
+    // // 确认收货
+    // function handleConfirmReceipt(order) {
+    //   updateOrderStatus({ order_id: order.order_id, state: '已完成' }).then(() => {
+    //     order.state = '已完成';
+    //   });
+    // }
+
     // 确认收货
     function handleConfirmReceipt(order) {
-      updateOrderStatus({ order_id: order.order_id, state: '已完成' }).then(() => {
-        order.state = '已完成';
-      });
+      confirmReceipt(order.order_id)  // 调用确认收货接口
+        .then((response) => {
+          console.log(response);  // 打印成功响应
+
+          // 如果确认收货成功，更新订单状态
+          order.state = '已收货';  // 更新本地订单状态
+          alert("收货确认成功！订单状态已更新为已收货！");
+
+          // 刷新订单列表
+          getList();
+        })
+        .catch((error) => {
+          console.error('确认收货失败:', error);
+          alert("确认收货失败，请稍后再试！");
+        });
     }
+
 
     // 打开评价弹窗
     function handleOpenReview(order) {
+      currentOrder.value = order;  // 将当前订单保存到 `currentOrder`
       reviewDialogVisible.value = true;
     }
 
@@ -149,9 +175,28 @@ export default {
 
     // 提交评价
     function handleSubmitReview() {
-      // 这里可以提交评价的逻辑，但目前先写死
-      console.log('评价提交：', reviewScore.value, reviewText.value);
-      handleReviewDialogClose();
+      const orderId = currentOrder.value.order_id;  // 获取当前订单的 order_id
+
+      const reviewData = {
+        order_id: orderId,
+        score: reviewScore.value,
+        comment: reviewText.value,
+      };
+
+      console.log('Review data to send:', reviewData);  // 打印提交的数据
+
+      submitReview(reviewData)  // 调用封装好的 API
+        .then(() => {
+          console.log('评价已提交', reviewData);
+          handleReviewDialogClose(); // 关闭评价弹窗
+          currentOrder.value.state = '已完成'; // 更新当前订单状态
+
+          // 刷新订单列表
+          getList();
+        })
+        .catch((error) => {
+          console.error('提交评价失败:', error);
+        });
     }
 
     // 初始化页面数据
@@ -162,11 +207,12 @@ export default {
     return {
       statusOptions,
       orders,
-      images,
+      //images,
       listQuery,
       reviewDialogVisible,
       reviewScore,
       reviewText,
+      currentOrder,
       handleFilterStatus,
       handleConfirmReceipt,
       handleOpenReview,
@@ -241,14 +287,27 @@ export default {
   height: auto; /* 使订单项高度适应内容 */
 }
 
+
 .order-item .order-details {
-  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;  /* 垂直排列订单信息 */
+  margin-right: 20px;  /* 订单信息与图片之间留出一定的间距 */
+  flex: 1;  /* 保证订单信息部分占据剩余空间 */
+}
+
+.order-item .product-image {
+  max-height: 40px;  /* 设置最大高度，确保图片大小与文本高度一致 */
+  width: auto;  /* 保持宽高比 */
+  border-radius: 10px;
+  object-fit: contain;  /* 图片不失真且保持宽高比 */
+  margin-left: auto;  /* 将图片推到最右侧 */
 }
 
 .order-item .order-info {
   display: flex;
   margin-bottom: 10px; /* 间距 */
   font-size: 18px; /* 字体大小 */
+  flex: 1 1 45%; /* 限制每个项的宽度 */
 }
 
 .order-item .order-info .order-label {
