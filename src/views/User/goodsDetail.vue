@@ -49,7 +49,7 @@
             </div>
             <div class="infoBox">
               <span>数量：</span>
-              <NumberInput v-model="num" :min="1" :max="goodsNum" />
+              <el-input-number v-model="num" :min="1" :max="goodsNum" @change="handleChange" />
             </div>
             <div class="infobox">
               <span>库存：{{ goodsNum }}</span>
@@ -122,7 +122,7 @@
     </div>
   </template>
 
-<script>
+<script lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import axios from 'axios'; // 用于发起 API 请求
 import {useRouter } from 'vue-router';
@@ -147,7 +147,7 @@ export default {
     const goodsPrice = ref('');
     const goodsClass = ref('');
     const goodsImg = ref([]);
-    const goodsNum = ref('');
+    const goodsNum = ref(10);
     const goodsPic = ref( );
     const specs = ref([]);
     const selectedSpecs = ref({});
@@ -157,7 +157,7 @@ export default {
     const commentList = ref([]);
     const rate = ref(0);
     const totalComment = ref(0);  // 总评论数
-    const limit = ref(5);  // 每页显示的评论数
+    const limit = ref(10);  // 每页显示的评论数
     const page = ref(1);    // 当前页码
 
     // 获取商品详情
@@ -271,6 +271,10 @@ export default {
       // 模拟数据请求，可以根据实际需求进行修改
     };
 
+    const handleChange = (value: number) => {
+      console.log(value)
+    }
+
     // 页面加载时获取商品详情和评论
     onMounted(() => {
       fetchGoodsDetail();
@@ -305,7 +309,8 @@ export default {
             score: 5,
           },
       curIndex: 0,
-      commentList
+      commentList,
+      handleChange, 
     };
 
   }
