@@ -192,7 +192,7 @@ export default {
         const response = await findByPid(goodsId); // 获取第一页的评论，每页10条
         const data = response.data;
 
-        commentAverageScore.value = data.reduce((sum, item) => sum + item.score, 0) / data.length;  // 计算评论的平均分
+        commentAverageScore.value = (data.reduce((sum, item) => sum + item.score, 0) / data.length).toFixed(2);
         commentList.value = data;  // 直接将返回的评论数据赋值给 commentList
         totalComment.value=data.length;
 
@@ -229,7 +229,7 @@ export default {
       }
     };
 
-    // 立即购买
+
     const handleBuyNow = async () => {
       try {
         await buyNow({
@@ -243,6 +243,7 @@ export default {
       }
     };
 
+    // 立即购买
     const goToBuyPage = () => {
       console.log('按钮点击，准备跳转到支付页面');
       console.log('购买数量',num.value);
