@@ -38,6 +38,7 @@
             action="http://localhost:8080/fastdfs/upload"
             :on-preview="handlePreview"
             multiple
+            :on-success="handleSuccess"
             :on-remove="handleRemove"
             list-type="picture"
         >
@@ -61,9 +62,10 @@
   </el-card>
 
 </template>
-<script>
 
+<script>
 import { addProduct } from '@/api/product'
+import { SuccessFilled } from '@element-plus/icons-vue';
 
 const defaultProductParam = {
   number: 0,
@@ -71,6 +73,7 @@ const defaultProductParam = {
   desc: '',
   pname: '',
   pclass: null,
+  img: '',
 };
 export default {
   name: 'ProductDetail',
@@ -165,7 +168,12 @@ export default {
         this.showStatus[this.active] = true;
       }
     },
-    finishCommit() {
+    handleSuccess(res, file) {
+      this.value.img = file.name;
+      console.log(this.value.img);
+    },
+    finishCommit(params) {
+      console.log(params);
       this.$confirm('是否要提交该产品', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -186,6 +194,7 @@ export default {
 
 }
 </script>
+
 <style>
 .centered-title-container {
   text-align: center;

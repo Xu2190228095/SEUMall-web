@@ -64,8 +64,8 @@
         <el-table-column label="商品描述" width="180" align="center">
           <template #default="scope">{{scope.row.desc}}</template>
         </el-table-column>
-        <el-table-column label="商品图片" align="center">
-          <template #default="scope">{{scope.row.img}}</template>
+        <el-table-column label="商品图片" width="180" align="center">
+          <template #default="scope"><img :src="images[scope.$index]" style="width: 100%;height: 100%;"></template>
         </el-table-column>
         <el-table-column label="商品金额" width="120" align="center">
           <template #default="scope">￥{{scope.row.price}}</template>
@@ -155,16 +155,16 @@ export default {
         value: null
       },
       {
-        label: '食品',
-        value: '食品'
+        label: '饮料',
+        value: '饮料'
       },
       {
-        label: '电子产品',
-        value: '电子产品'
+        label: '手机',
+        value: '手机'
       },
       {
-        label: '家电',
-        value: '家电'
+        label: '电脑',
+        value: '电脑'
       }
     ])
     const list = ref([
@@ -248,6 +248,7 @@ export default {
       //   "id": 8
       // }
     ])
+    const images = ref([])
     const multipleSelection = ref([])
     const listLoading = ref(false)
     const logisticsDialogVisible = ref(false)
@@ -354,6 +355,7 @@ export default {
         listLoading.value = false;
         list.value = res.data.list;
         total.value = res.data.total;
+        images.value = res.data.pictures.map(picture => `data:image/jpg;base64,${picture}`);
         console.log(list.value)
         console.log(total.value)
       }).catch(err => {
@@ -409,6 +411,7 @@ export default {
     return {
       classOptions,
       list,
+      images,
       multipleSelection,
       listLoading,
       logisticsDialogVisible,

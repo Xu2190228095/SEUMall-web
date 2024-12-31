@@ -6,10 +6,10 @@
         <!-- 订单信息 -->
         <div class="order-summary">
           <h2>订单信息</h2>
-          <el-row>
+          <!-- <el-row>
             <el-col :span="12"><strong>订单编号：</strong>{{ orderInfo.orderId }}</el-col>
-            <el-col :span="12" class="text-right"><strong>支付总额：</strong>{{ orderInfo.totalAmount }} 元</el-col>
-          </el-row>
+            <el-col :span="24" class="text-right"><strong>支付总额：</strong>{{ orderInfo.totalAmount }} 元</el-col>
+          </el-row> -->
           
           <div v-for="(item, index) in orderItems" :key="item.id" class="order-item">
             <el-row>
@@ -17,7 +17,7 @@
               <el-col :span="12" class="text-right">{{ item.totalPrice }} 元</el-col>
             </el-row>
             <el-row>
-              <img :src="images[index].link" alt="" style="height:100px;">
+              <img :src="image" alt="" style="height:100px;">
             </el-row>
           </div>
           
@@ -64,7 +64,6 @@
             v-model="remark"
             type="textarea"
             placeholder="如有备注，请填写"
-            rows="4"
           />
         </div>
     
@@ -82,23 +81,31 @@
   </template>
   
   <script lang="ts" setup>
-  import { ref } from 'vue'
+  import { onMounted, ref } from 'vue'
   import { ElRow, ElCol, ElRadioGroup, ElRadio, ElButton, ElAlert, ElInput } from 'element-plus'
   import SimpleHeader from '@/components/SimpleHeader.vue';
-  
-  // 订单信息数据
-  const orderInfo = ref({
-    orderId: '20240012345',
-    totalAmount: 199.98,
-    discount: 10.00
+  import { useRouter } from 'vue-router';
+  import { fetchProduct} from '../../api/product'; // 引入封装的接口
+
+  const router = useRouter();
+
+  const orderInfo = ref({})
+
+  const image = ref()
+
+  onMounted(() => {
+    //console.log(JSON.parse(router.currentRoute.value.query.products))
+    orderInfo.value.pid = router.currentRoute.value.query.goodsId
+    orderInfo.value.number = router.currentRoute.value.query.quantity
+    fetchProduct(orderInfo.value.pid).then(res => {
+      orderInfo.value.totalAmount = res.data.product.price*orderInfo.value.number
+      image.value = `data:image/jpg;base64,${res.data.picture}`
+    });
+    
   })
   
   const orderItems = ref([
-    { id: 1, name: '小米15', price: 99.99, quantity: 2, totalPrice: 199.98 },
-  ])
-
-  const images = ref([
-    {link:'https://2d.zol-img.com.cn/product/215_800x600/931/ceEZ5pBcvRQJQ.jpg'},
+    { id: 1, name: '哇哈哈矿泉水', price: 2, quantity: 2, totalPrice: 4 },
   ])
   
 
@@ -115,16 +122,13 @@
   // 订单备注
   const remark = ref('')
   
-  const editAddress = () => {
-    alert('修改地址功能暂未实现')
-  }
-  
   // 处理支付的函数
   const handlePayment = () => {
     console.log(`支付方式: ${selectedPaymentMethod.value}`)
     console.log(`支付金额: ${orderInfo.value.totalAmount}`)
     alert('支付成功！')
   }
+
   </script>
   
   <style scoped>

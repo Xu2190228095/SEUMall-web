@@ -1,12 +1,7 @@
 <template>
     <div class="GoodsDetail">
       <el-header class="header">
-        <el-button type="primary"
-        class="menu-btn"
-        style="margin-left: 10px;"
-        @click="$router.push('/homePage')">首页</el-button>
-
-        <div class="logo">东南易购</div>
+        <router-link class="logo" to="/homePage">东南易购</router-link>
         <el-input
           v-model="searchQuery"
           class="search-bar"
@@ -30,7 +25,7 @@
                 <!-- 商品图片部分 -->
             <div class="item-detail-left" style="display: inline-block; transform: translate(150px, 0);">
                 <div class="item-detail-big-img">
-                    <img :src= "productImage1" alt="商品图片" />
+                    <img :src= "goodsPic" alt="商品图片" />
                 </div>
             </div>
           <div class="infoRight" style="display: inline-block">
@@ -124,18 +119,13 @@
 
 <script lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import axios from 'axios'; // 用于发起 API 请求
 import {useRouter } from 'vue-router';
 import { fetchProduct} from '../../api/product'; // 引入封装的接口
 import { findByPid} from '../../api/comments'; // 引入封装的接口
-import NumberInput from '../../components/numberInput.vue';
-import productImage1 from '@/assets/images/wahahawater.jpg'
+import Header from '@/components/Header.vue'
 
 export default {
   name: 'GoodsDetail',
-  components: {
-    NumberInput,
-  },
   setup() {
 
     const router = useRouter();
@@ -148,7 +138,7 @@ export default {
     const goodsClass = ref('');
     const goodsImg = ref([]);
     const goodsNum = ref(10);
-    const goodsPic = ref( );
+    const goodsPic = ref();
     const specs = ref([]);
     const selectedSpecs = ref({});
     const commentAverageScore=ref('');
@@ -165,8 +155,8 @@ export default {
       try {
         const response = await fetchProduct(goodsId);
         const data = response.data.product;
-        console.log("data:",data);
-        goodsPic.value=response.data.picture;
+        console.log("data:",response.data);
+        goodsPic.value=`data:image/jpg;base64,${response.data.picture}`;
         goodsName.value = data.pname;
         goodsDesc.value = data.desc;
         goodsPrice.value = data.price;
@@ -282,7 +272,22 @@ export default {
       fetchComments();
     });
 
+    const searchQuery = ref('')  // 存储搜索关键词
+    function search() {
+      const query = searchQuery.value;  // 获取去除空格的搜索关键词
+      if (query) {
+        console.log('keyword:', query);  // 打印出查询参数
+        router.push({ path: '/productSearch', query: { productname: query } });  // 跳转到搜索结果页面，并传递查询参数
+      }
+    }
+
+  // 切换标签页
+
     return {
+      searchQuery,
+      search,
+      goodsPic,
+      Header,
       num,
       totalComment,
       limit,
@@ -301,7 +306,6 @@ export default {
       handleAddToCart,
       handleBuyNow,
       goToBuyPage,
-      productImage1,
       commentAverageScore,
       commentScoreList,
       commentContentList,
@@ -401,11 +405,6 @@ export default {
           .tips {
             width: auto;
             margin: 0 20px 0 5px;
-          }
-
-          .NumberInput {
-            display: inline-block;
-            vertical-align: middle;
           }
         }
 

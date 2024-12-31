@@ -35,9 +35,9 @@
                 <el-menu-item index="1-1">
                   <router-link to="/adminUser/user_info">用户列表</router-link>
                 </el-menu-item>
-                <el-menu-item index="1-2">
+                <!-- <el-menu-item index="1-2">
                   <router-link to="">权限管理</router-link>
-                </el-menu-item>
+                </el-menu-item> -->
               </el-menu-item-group>
             </el-sub-menu>
           </el-menu>

@@ -34,7 +34,7 @@
           <h2>热门商品</h2>
             <el-row gutter="20">
             <el-col v-for="(product, index) in hotProducts" :key="index" :span="6">
-              <router-link :to="{ path: '/productInterface', query: { id: product.pid } }">
+              <router-link :to="{ path: '/productInterface', query: { id: product.id } }">
                 <img :src="images[index]" class="product-image" style="border-radius: 10px;"/>
                 <div class="product-info">
                   <p style="overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
@@ -65,8 +65,8 @@
 
         <el-menu class="sidebar-menu" mode="vertical">
           <el-menu-item index="1"><router-link to="/userInfo">个人信息</router-link></el-menu-item>
-          <el-menu-item index="2">购物车</el-menu-item>
-          <el-menu-item index="3">客服</el-menu-item>
+          <!-- <el-menu-item index="2">购物车</el-menu-item>
+          <el-menu-item index="3">客服</el-menu-item> -->
         </el-menu>
         
       </el-aside>
@@ -136,7 +136,9 @@ function handleClick(text) {
   getProductsByClass(pclass).then(res => {
     console.log(res);
     hotProducts.value = res.data.products;
+    console.log(hotProducts.value);
     images.value = res.data.pictures.map(picture => `data:image/jpg;base64,${picture}`);
+    console.log(images.value);
   })
 }
 onMounted(() => {
