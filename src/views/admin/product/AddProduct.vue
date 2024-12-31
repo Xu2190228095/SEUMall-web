@@ -113,7 +113,6 @@ export default {
           {required: true, message: '请输入商品名称', trigger: 'blur'},
           {min: 2, max: 140, message: '长度在 2 到 140 个字符', trigger: 'blur'}
         ],
-        subTitle: [{required: true, message: '请输入商品副标题', trigger: 'blur'}],
         pclass: [{required: true, message: '请选择商品分类', trigger: 'blur'}],
         brandId: [{required: true, message: '请选择商品品牌', trigger: 'blur'}],
         description: [{required: true, message: '请输入商品介绍', trigger: 'blur'}],

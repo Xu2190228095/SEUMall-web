@@ -80,9 +80,6 @@ export default {
             }
       })
 
-
-
-
     }
 
     const fileList = ref<UploadUserFile[]>([])
