@@ -35,7 +35,7 @@
       </el-header>
         <el-row gutter="20" style="margin-left: 80px; margin-right: 80px;">
             <el-col v-for="(product, index) in Products" :key="index" :span="6">
-              <router-link :to="{ path: '/productInterface', query: { id: product.pid } }">
+              <router-link :to="{ path: '/productInterface', query: { id: product.id } }">
                 <img :src="images[index]" class="product-image" style="border-radius: 10px;"/>
                 <div class="product-info">
                   <p style="overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
@@ -65,8 +65,8 @@
         <!-- 侧边栏 -->
         <el-menu class="sidebar-menu" mode="vertical">
           <el-menu-item index="1">消息</el-menu-item>
-          <el-menu-item index="2">购物车</el-menu-item>
-          <el-menu-item index="3">客服</el-menu-item>
+          <!-- <el-menu-item index="2">购物车</el-menu-item>
+          <el-menu-item index="3">客服</el-menu-item> -->
         </el-menu>
       </el-aside>
     </el-container>

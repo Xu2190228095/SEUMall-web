@@ -49,9 +49,9 @@
                 <el-menu-item index="2-1">
                   <router-link to="/admin/order_info">订单列表</router-link>
                 </el-menu-item>
-                <el-menu-item index="2-2">
+                <!-- <el-menu-item index="2-2">
                   <router-link to="/admin/refund_deal">退款处理</router-link>
-                </el-menu-item>
+                </el-menu-item> -->
               </el-menu-item-group>
             </el-sub-menu>
           </el-menu>
