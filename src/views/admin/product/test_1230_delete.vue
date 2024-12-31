@@ -78,10 +78,10 @@
         </el-table-column>
         <el-table-column label="操作" width="300" align="center">
           <template #default="scope">
-            <el-button
-                size="mini"
-                @click="handleViewOrder(scope.$index, scope.row)"
-            >编辑商品</el-button>
+<!--            <el-button-->
+<!--                size="mini"-->
+<!--                @click="handleViewOrder(scope.$index, scope.row)"-->
+<!--            >编辑商品</el-button>-->
             <el-button
                 size="mini"
                 @click="handleDeleteProduct(scope.$index, scope.row)"
@@ -271,10 +271,6 @@ export default {
     const operateType = ref(null)
     const operateOptions = [
       {
-        label: "批量上架",
-        value: 1
-      },
-      {
         label: "批量删除",
         value: 2
       },
@@ -393,15 +389,7 @@ export default {
           }).catch(error => {
             console.log(error);
           });
-          console.log("test_batch_delete");
         }
-      }else if(this.operateType===3){
-        //删除订单
-        let ids=[];
-        for(let i=0;i<this.multipleSelection.length;i++){
-          ids.push(this.multipleSelection[i].id);
-        }
-        this.deleteOrder(ids);
       }
     }
     onMounted(() => {

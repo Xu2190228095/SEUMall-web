@@ -52,9 +52,9 @@
                 @selection-change="handleSelectionChange"
                 v-loading="listLoading" border>
         <el-table-column type="selection" width="60" align="center"></el-table-column>
-<!--        <el-table-column label="编号" width="80" align="center">-->
-<!--          <template #default="scope">{{scope.row.id}}</template>-->
-<!--        </el-table-column>-->
+        <!--        <el-table-column label="编号" width="80" align="center">-->
+        <!--          <template #default="scope">{{scope.row.id}}</template>-->
+        <!--        </el-table-column>-->
         <el-table-column label="商品编号" width="80" align="center">
           <template #default="scope">{{scope.row.id}}</template>
         </el-table-column>
@@ -78,23 +78,14 @@
         </el-table-column>
         <el-table-column label="操作" width="300" align="center">
           <template #default="scope">
+            <!--            <el-button-->
+            <!--                size="mini"-->
+            <!--                @click="handleViewOrder(scope.$index, scope.row)"-->
+            <!--            >编辑商品</el-button>-->
             <el-button
                 size="mini"
-                @click="handleViewOrder(scope.$index, scope.row)"
-            >编辑商品</el-button>
-            <el-button
-                size="mini"
-                @click="handleDeliveryOrder(scope.$index, scope.row)"
-                v-show="scope.row.state==='待发货'">订单发货</el-button>
-            <el-button
-                size="mini"
-                @click="handleViewLogistics(scope.$index, scope.row)"
-                v-show="scope.row.state==='已发货' || scope.row.state==='已收货'">订单跟踪</el-button>
-            <el-button
-                size="mini"
-                type="danger"
-                @click="handleDeleteOrder(scope.$index, scope.row)"
-                v-show="scope.row.state==='已完成'">删除订单</el-button>
+                @click="handleDeleteProduct(scope.$index, scope.row)"
+            >删除商品</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -154,7 +145,7 @@
 <script>
 import { reactive, ref, onMounted, getCurrentInstance } from 'vue'
 import router from '../../../router';
-import { fetchList } from '@/api/product'
+import { fetchList,deleteProduct } from '@/api/product'
 
 export default {
   setup() {
@@ -280,21 +271,20 @@ export default {
     const operateType = ref(null)
     const operateOptions = [
       {
-        label: "批量上架",
-        value: 1
-      },
-      {
         label: "批量删除",
         value: 2
       },
     ]
+
     function handleSelectionChange(val) {
       multipleSelection.value = val;
     }
+
     function handleViewOrder(index, row) {
       console.log(index, row)
       router.push('/admin/order_detail')
     }
+
     function handleDeliveryOrder(index, row) {
       const deliveryForm = {
         id: row.id,
@@ -310,32 +300,40 @@ export default {
       })
       getList();
     }
+
     function handleViewLogistics(index, row) {
       logisticsDialogVisible.value = true; //to do
     }
-    function handleDeleteOrder(index, row) {
+
+    function handleDeleteProduct(index, row) {
+      //删除商品操作
       const id = {
         id: row.id
       }
-      deleteOrder(id).then(response => {
+      console.log("id====", id);
+      deleteProduct(id).then(response => {
       }).catch(error => {
         console.log(error);
       });
       getList();
     }
+
     function handleLogisticsDialogClose(done) {
       logisticsDialogVisible.value = false;
       done();
     }
+
     function handleSizeChange(val) {
       listQuery.value.pageNum = 1;
       listQuery.value.pageSize = val;
       getList();
     }
+
     function handleCurrentChange(val) {
       listQuery.value.pageNum = val;
       getList();
     }
+
     function handleResetSearch() {
       listQuery.value.pageNum = 1;
       listQuery.value.id = null;
@@ -343,11 +341,13 @@ export default {
       listQuery.value.pclass = null;
       getList();
     }
+
     function handleSearchList() {
       listQuery.value.pageNum = 1;
       console.log(listQuery.value);
       getList();
     }
+
     function getList() {
       // listLoading.value = true;
       fetchList(listQuery.value).then(res => {
@@ -363,8 +363,46 @@ export default {
     }
 
     function handleBatchOperate() {
+      console.log("test_batch_operate")
       console.log(operateType.value, multipleSelection.value)  //to do
+      if (multipleSelection.length < 1) {
+        this.$message({
+          message: '请选择要操作的订单',
+          type: 'warning',
+          duration: 1000
+        });
+        return;
+      }
+      if (this.operateType === 1) {
+        //批量发货
+        let list = [];
+        for (let i = 0; i < this.multipleSelection.length; i++) {
+          if (this.multipleSelection[i].status === 1) {
+            list.push(this.covertOrder(this.multipleSelection[i]));
+          }
+        }
+        if (list.length === 0) {
+          this.$message({
+            message: '选中订单中没有可以发货的订单',
+            type: 'warning',
+            duration: 1000
+          });
+          return;
+        }
+        this.$router.push({path: '/oms/deliverOrderList', query: {list: list}})
+      } else if (this.operateType === 2) {
+        //删除商品
+
+        for (let i = 0; i < this.multipleSelection.length; i++) {
+          console.log("this.multipleSelection[i]:", this.multipleSelection[i]);
+          deleteProduct(this.multipleSelection[i]).then(response => {
+          }).catch(error => {
+            console.log(error);
+          });
+        }
+      }
     }
+
     onMounted(() => {
       getList();
     })
@@ -383,7 +421,7 @@ export default {
       handleViewOrder,
       handleDeliveryOrder,
       handleViewLogistics,
-      handleDeleteOrder,
+      handleDeleteProduct,
       handleLogisticsDialogClose,
       handleSizeChange,
       handleCurrentChange,
