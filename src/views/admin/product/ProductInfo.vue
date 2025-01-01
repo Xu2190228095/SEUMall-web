@@ -159,12 +159,28 @@ export default {
         value: '饮料'
       },
       {
+        label: '食品',
+        value: '食品'
+      },
+      {
         label: '手机',
         value: '手机'
       },
       {
         label: '电脑',
         value: '电脑'
+      },
+      {
+        label: '耳机',
+        value: '耳机'
+      },
+      {
+        label: '男装',
+        value: '男装'
+      },
+      {
+        label: '床上用品',
+        value: '床上用品'
       }
     ])
     const list = ref([

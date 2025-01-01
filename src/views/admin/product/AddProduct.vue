@@ -11,7 +11,7 @@
               :options="productCateOptions">
           </el-cascader>
         </el-form-item>
-        <el-form-item label="商品名称：" prop="name">
+        <el-form-item label="商品名称：" >
           <el-input v-model="value.pname"></el-input>
         </el-form-item>
         <el-form-item label="商品介绍：">
@@ -112,14 +112,10 @@ export default {
         }],
       value:Object.assign({}, defaultProductParam),
       rules: {
-        name: [
-          {required: true, message: '请输入商品名称', trigger: 'blur'},
-          {min: 2, max: 140, message: '长度在 2 到 140 个字符', trigger: 'blur'}
-        ],
+        name: [{required: true, message: '请输入商品名称', trigger: 'blur'},],
         pclass: [{required: true, message: '请选择商品分类', trigger: 'blur'}],
         brandId: [{required: true, message: '请选择商品品牌', trigger: 'blur'}],
         description: [{required: true, message: '请输入商品介绍', trigger: 'blur'}],
-        requiredProp: [{required: true, message: '该项为必填项', trigger: 'blur'}]
       },
     }
   },
